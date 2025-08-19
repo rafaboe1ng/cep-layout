@@ -25,7 +25,18 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	});
 
-	// Todos fechados por padrão
-	document.querySelectorAll('.accordion-content').forEach(c => c.classList.remove('open'));
-	document.querySelectorAll('.accordion-header').forEach(h => h.classList.remove('active'));
+        // Todos fechados por padrão
+        document.querySelectorAll('.accordion-content').forEach(c => c.classList.remove('open'));
+        document.querySelectorAll('.accordion-header').forEach(h => h.classList.remove('active'));
+
+        // Exibe campos de data personalizada quando necessário
+        const dateFilter = document.getElementById('dateFilter');
+        const customDateRange = document.getElementById('customDateRange');
+        if (dateFilter && customDateRange) {
+                const toggleCustomRange = () => {
+                        customDateRange.style.display = (dateFilter.value === 'custom') ? 'flex' : 'none';
+                };
+                toggleCustomRange();
+                dateFilter.addEventListener('change', toggleCustomRange);
+        }
 });
