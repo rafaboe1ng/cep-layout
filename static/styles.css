@@ -93,64 +93,6 @@
 	.title { font-size: 2.2rem; }
 	.footer, .footer span { font-size: 0.85rem; }
 }
-.charts-flex {
-	display: flex;
-	flex-direction: column;
-	gap: 40px;
-	height: 100%;
-	justify-content: flex-start;
-}
-.charts-row {
-	display: flex;
-	flex-direction: row;
-	gap: 40px;
-	justify-content: center;
-	align-items: stretch;
-}
-.small-chart {
-	flex: 1 1 0;
-	max-width: 420px;
-	min-width: 320px;
-	min-height: 320px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: flex-start;
-}
-.main-chart {
-	flex: 0 1 auto;
-	padding-bottom: 0;
-	margin-bottom: 0;
-	min-height: 420px;
-	margin-right: 40px;
-	margin-top: 0px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: flex-start;
-	border-color: #e74c3c;
-	border-width: 3px;
-}
-.today-chart {
-	flex: 1 1 0;
-	min-width: 320px;
-	max-width: 420px;
-	min-height: 420px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: flex-start;
-	border-color: #27ae60;
-	border-width: 3px;
-}
-.today-chart .chart-title {
-	color: #3498db;
-	font-size: 1.5rem;
-}
-.main-chart .chart-title {
-	color: #3498db;
-	font-size: 1.7rem;
-}
 /* Layout visual para TV, focado em imagens de gráficos */
 body {
 	font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -365,24 +307,19 @@ body {
 	display: block;
 }
 .filter-select, .date-input {
-        width: 100%;
-        padding: 12px 15px;
-        background-color: #2c3e50;
-        border: 2px solid #3498db;
-        border-radius: 8px;
-        color: #ffffff;
-        font-size: 1.2rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        margin-bottom: 10px;
-}
-.custom-date-range {
-        display: none;
-        flex-direction: column;
-        gap: 10px;
+	width: 100%;
+	padding: 12px 15px;
+	background-color: #2c3e50;
+	border: 2px solid #3498db;
+	border-radius: 8px;
+	color: #ffffff;
+	font-size: 1.2rem;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	margin-bottom: 10px;
 }
 .checkbox-group, .radio-group {
-        display: flex;
+	display: flex;
 	flex-direction: column;
 	gap: 15px;
 }
@@ -437,142 +374,99 @@ body {
 }
 
 .charts-area {
-	flex: 1 1 0;
-	padding: 80px 40px 40px 40px;
-	overflow-y: auto;
-	overflow-x: hidden;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
-	align-items: stretch;
-	min-width: 0;
-	min-height: 0;
-	scroll-behavior: smooth;
-}
-.charts-grid {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	grid-template-rows: 1fr 1fr;
-	gap: 40px;
-	height: 100%;
-}
-.chart-container {
-	background-color: #34495e;
-	border: 2px solid #3498db;
-	border-radius: 12px;
-	padding: 30px;
-	display: flex;
-	flex-direction: column;
-	transition: all 0.3s ease;
-	box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-	align-items: center;
-}
-.chart-container:hover {
-	transform: translateY(-5px);
-	box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-	border-color: #2980b9;
-}
-.main-chart {
-	border-color: #2980b9;
-	border-width: 3px;
-}
-.main-chart:hover { border-color: #3498db; }
-.chart-title {
-	font-size: 1.5rem;
-	font-weight: 700;
-	color: #3498db;
-	margin-bottom: 15px;
-	text-align: center;
-	text-transform: uppercase;
-	letter-spacing: 1px;
-}
-.main-chart .chart-title {font-size: 1.7rem; }
-.chart-img {
-	width: 100%;
-	max-width: 800px;
-	height: auto;
-	border-radius: 8px;
-	box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-	background: #222;
+    flex: 1 1 0;
+    padding: 32px 32px 0 32px;
+    margin: 0;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    min-height: 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.footer {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 20px 60px;
-	background-color: #34495e;
-	border-top: 2px solid #3498db;
-	font-size: 1.3rem;
-	color: #bdc3c7;
+.charts-grid-responsive {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 32px 32px;
+    width: 100%;
+    max-width: 1800px;
+    margin: 0 auto;
+    align-items: start;
+    justify-items: center;
 }
-.footer span { font-weight: 500; }
 
-@media (max-width: 1400px) {
-	.title { font-size: 2.5rem; }
-	.datetime { font-size: 1.7rem; }
-	.sidebar { width: 220px; }
-	.chart-title { font-size: 1.1rem; }
-	.charts-area { padding: 20px; }
-	.chart-container { padding: 15px; }
+.charts-grid-responsive .chart-item {
+    background: #34495e;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    padding: 18px 18px 10px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    min-height: 0;
+    width: 100%;
+    max-width: 420px;
 }
-@media (max-width: 1200px) {
-	.header { padding: 15px 20px; }
-	.title { font-size: 1.7rem; }
-	.sidebar { width: 120px; }
-	.charts-area { padding: 10px; }
-	.chart-container { padding: 8px; }
+
+.charts-grid-responsive .chart-title {
+    font-size: 1.2rem;
+    color: var(--amarelo-cep);
+    margin-bottom: 10px;
+    text-align: center;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
-/* Ajustes para TV */
-body {
-	font-size: 22px;
+
+.charts-grid-responsive .top3-title {
+    font-size: 1.5rem;
+    color: var(--amarelo-cep);
+    margin: 0 0 8px 0;
+    grid-column: 1 / -1;
+    text-align: center;
 }
-.header, .footer {
-	font-size: 2.2rem;
+
+.charts-grid-responsive .chart-img {
+    width: 100%;
+    max-width: 360px;
+    height: auto;
+    aspect-ratio: 16/9;
+    object-fit: contain;
+    border-radius: 8px;
+    background: #222;
 }
-.title {
-	font-size: 3.2rem;
+
+@media (min-width:2000px){
+    .charts-grid-responsive { grid-template-columns: repeat(auto-fit,minmax(480px,1fr)); }
+    .top3-title { font-size:2.4rem; }
 }
-.sidebar {
-	font-size: 1.5rem;
+
+@media (max-width:900px){
+    .charts-grid-responsive { grid-template-columns: 1fr 1fr; }
+    .charts-grid-responsive .main-chart,
+    .charts-grid-responsive .today-chart,
+    .charts-grid-responsive .small-chart {
+        height: 40vw;
+        min-height: 180px;
+        max-height: 45vw;
+    }
+    .top3-title { font-size:1.6rem; }
 }
-.sidebar-title {
-	font-size: 2.2rem;
-}
-.accordion-header {
-	font-size: 1.5rem;
-}
-.chart-title {
-	font-size: 1.5rem;
-}
-.main-chart .chart-title {
-	font-size: 1.7rem;
-}
-.update-now-btn {
-	font-size: 1.3rem;
-	padding: 18px 36px;
-}
-.toggle-label {
-	font-size: 1.2rem;
-}
-.filter-select, .date-input {
-	font-size: 1.2rem;
-}
-.checkbox-label, .radio-label {
-	font-size: 1.2rem;
-}
-.charts-area {
-	padding: 40px;
-}
-.charts-grid {
-	gap: 40px;
-}
-.chart-container {
-	padding: 30px;
-}
-@media (max-width: 1920px) {
-	body { font-size: 18px; }
-	.title { font-size: 2.5rem; }
+
+@media (max-width:640px){
+    .charts-grid-responsive { grid-template-columns:1fr; }
+    .charts-grid-responsive .main-chart,
+    .charts-grid-responsive .today-chart,
+    .charts-grid-responsive .small-chart {
+        height: 48vw;
+        min-height: 120px;
+        max-height: 60vw;
+    }
+    .top3-title { font-size:1.4rem; }
 }
 /* CSS principal do dashboard, pronto para TV. O conteúdo será atualizado na próxima etapa. */
 
@@ -816,42 +710,4 @@ button.accordion-header:active {
     font-weight: 400;
     margin-top: -2px;
     line-height: 1;
-}
-
-/* Responsive tables */
-.table-container {
-    width: 100%;
-    overflow-x: auto;
-<<<<<<< codex/formatar-tabelas-para-caber-na-tela-bhljlk
-    -webkit-overflow-scrolling: touch;
-}
-
-.table-container table {
-=======
-}
-
-table {
->>>>>>> main
-    width: 100%;
-    border-collapse: collapse;
-}
-
-<<<<<<< codex/formatar-tabelas-para-caber-na-tela-bhljlk
-.table-container th,
-.table-container td {
-    padding: 8px;
-    text-align: left;
-}
-
-@media (max-width: 600px) {
-    .table-container th,
-    .table-container td {
-=======
-@media (max-width: 600px) {
-    table th,
-    table td {
->>>>>>> main
-        font-size: 0.9rem;
-        word-break: break-word;
-    }
 }

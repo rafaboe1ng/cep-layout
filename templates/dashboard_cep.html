@@ -105,35 +105,27 @@
 
 		<!-- Charts Area (agora apenas imagens) -->
 		<section class="charts-area">
-			<div class="charts-flex">
-				<!-- Top 6/Geral em cima -->
-				<div class="charts-row">
-					<div class="chart-container main-chart">
-						<h4 class="chart-title">DEFEITOS - HOJE</h4>
-						<img src="{{ url_for('static', filename='top6-defeitos.png') }}" class="chart-img" alt="Top 6 Defeitos">
-					</div>
-					<div class="chart-container today-chart">
-						<h4 class="chart-title">TODOS OS DEFEITOS</h4>
-						<img src="{{ url_for('static', filename='exemplo.png') }}" class="chart-img" alt="Defeitos Hoje">
-					</div>
+			<div class="charts-grid-responsive">
+				<div class="chart-item main-chart">
+					<h4 class="chart-title">DEFEITOS - HOJE</h4>
+					<img src="{{ url_for('static', filename='top6-defeitos.png') }}" class="chart-img" alt="Top 6 Defeitos">
 				</div>
-				<!-- Linha dos 3 principais -->
-				<div style="width: 100%; text-align: center; margin: 24px 0 0 0;">
-					<h3 class="chart-title" style="font-size: 2rem; color: #fbc910; margin-bottom: 8px;">TOP 3 DEFEITOS</h3>
+				<div class="chart-item today-chart">
+					<h4 class="chart-title">TODOS OS DEFEITOS</h4>
+					<img src="{{ url_for('static', filename='exemplo.png') }}" class="chart-img" alt="Defeitos Hoje">
 				</div>
-				<div class="charts-row">
-					<div class="chart-container small-chart">
-						<h4 class="chart-title">FIAÇÃO COM SOLDA FRIA</h4>
-						<img src="{{ url_for('static', filename='exemplo.png') }}" class="chart-img" alt="Fiação com Solda Fria">
-					</div>
-					<div class="chart-container small-chart">
-						<h4 class="chart-title">RESPINGO DE SOLDA</h4>
-						<img src="{{ url_for('static', filename='exemplo.png') }}" class="chart-img" alt="Respingo de Solda">
-					</div>
-					<div class="chart-container small-chart">
-						<h4 class="chart-title">CURTO POR SOLDA</h4>
-						<img src="{{ url_for('static', filename='exemplo.png') }}" class="chart-img" alt="Curto por Solda">
-					</div>
+				<div class="top3-title">TOP 3 DEFEITOS</div>
+				<div class="chart-item small-chart">
+					<h4 class="chart-title">FIAÇÃO COM SOLDA FRIA</h4>
+					<img src="{{ url_for('static', filename='exemplo.png') }}" class="chart-img" alt="Fiação com Solda Fria">
+				</div>
+				<div class="chart-item small-chart">
+					<h4 class="chart-title">RESPINGO DE SOLDA</h4>
+					<img src="{{ url_for('static', filename='exemplo.png') }}" class="chart-img" alt="Respingo de Solda">
+				</div>
+				<div class="chart-item small-chart">
+					<h4 class="chart-title">CURTO POR SOLDA</h4>
+					<img src="{{ url_for('static', filename='exemplo.png') }}" class="chart-img" alt="Curto por Solda">
 				</div>
 			</div>
 		</section>
