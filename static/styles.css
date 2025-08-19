@@ -106,6 +106,17 @@ body {
   padding: 40px 5px;
 }
 
+/* Esconde todos os textos e controles da sidebar quando minimizada */
+.sidebar.minimized .sidebar-title,
+.sidebar.minimized .accordion-header,
+.sidebar.minimized .accordion-content,
+.sidebar.minimized .checkbox-label,
+.sidebar.minimized .radio-label,
+.sidebar.minimized .filter-select,
+.sidebar.minimized .custom-date-range {
+  display: none;
+}
+
 .sidebar-header {
   display: flex;
   align-items: center;
