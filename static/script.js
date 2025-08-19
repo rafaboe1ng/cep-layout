@@ -29,13 +29,4 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.accordion-content').forEach(c => c.classList.remove('open'));
         document.querySelectorAll('.accordion-header').forEach(h => h.classList.remove('active'));
 
-        // Garante que todas as tabelas fiquem em um contêiner responsivo
-        document.querySelectorAll('table').forEach(table => {
-                if (!table.parentElement.classList.contains('table-container')) {
-                        const wrapper = document.createElement('div');
-                        wrapper.classList.add('table-container');
-                        table.parentNode.insertBefore(wrapper, table);
-                        wrapper.appendChild(table);
-                }
-        });
 });

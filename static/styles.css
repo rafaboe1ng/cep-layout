@@ -365,19 +365,24 @@ body {
 	display: block;
 }
 .filter-select, .date-input {
-	width: 100%;
-	padding: 12px 15px;
-	background-color: #2c3e50;
-	border: 2px solid #3498db;
-	border-radius: 8px;
-	color: #ffffff;
-	font-size: 1.2rem;
-	cursor: pointer;
-	transition: all 0.3s ease;
-	margin-bottom: 10px;
+        width: 100%;
+        padding: 12px 15px;
+        background-color: #2c3e50;
+        border: 2px solid #3498db;
+        border-radius: 8px;
+        color: #ffffff;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 10px;
+}
+.custom-date-range {
+        display: none;
+        flex-direction: column;
+        gap: 10px;
 }
 .checkbox-group, .radio-group {
-	display: flex;
+        display: flex;
 	flex-direction: column;
 	gap: 15px;
 }
@@ -817,14 +822,21 @@ button.accordion-header:active {
 .table-container {
     width: 100%;
     overflow-x: auto;
+<<<<<<< codex/formatar-tabelas-para-caber-na-tela-bhljlk
     -webkit-overflow-scrolling: touch;
 }
 
 .table-container table {
+=======
+}
+
+table {
+>>>>>>> main
     width: 100%;
     border-collapse: collapse;
 }
 
+<<<<<<< codex/formatar-tabelas-para-caber-na-tela-bhljlk
 .table-container th,
 .table-container td {
     padding: 8px;
@@ -834,6 +846,11 @@ button.accordion-header:active {
 @media (max-width: 600px) {
     .table-container th,
     .table-container td {
+=======
+@media (max-width: 600px) {
+    table th,
+    table td {
+>>>>>>> main
         font-size: 0.9rem;
         word-break: break-word;
     }
