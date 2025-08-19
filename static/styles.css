@@ -812,3 +812,22 @@ button.accordion-header:active {
     margin-top: -2px;
     line-height: 1;
 }
+
+/* Responsive tables */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+@media (max-width: 600px) {
+    table th,
+    table td {
+        font-size: 0.9rem;
+        word-break: break-word;
+    }
+}
