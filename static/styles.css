@@ -1,0 +1,814 @@
+:root {
+    --amarelo-cep: #fbc910;
+    --azul-escuro-cep: #25507a;
+    --azul-escuro-hover: #1a355e;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: row;
+    gap: 0px;
+    margin-bottom: 0;
+    justify-content: flex-start;
+    margin-top: 0;
+    padding-top: 0;
+}
+
+/* Espaço entre Filtros e Data */
+.accordion-item:first-child {
+    margin-top: 16px;
+}
+
+.sidebar-hamburger-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 38px;
+    height: 38px;
+    border: none;
+    background: transparent !important;
+    color: var(--amarelo-cep) !important;
+    border: none !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    padding: 0;
+    margin: 0 8px 0 0;
+    border-radius: 8px;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+.sidebar-hamburger-btn:hover {
+	background: #25507a !important;
+}
+.hamburger-bar {
+	width: 26px;
+	height: 4px;
+	background: #3498db;
+	border-radius: 2px;
+	margin: 3px 0;
+	transition: background 0.2s;
+}
+.sidebar {
+	width: 320px;
+	background-color: #34495e;
+	padding: 0 12px 24px 12px;
+	align-items: flex-start;
+	border-right: 2px solid #3498db;
+	overflow-y: auto;
+	min-width: 60px;
+	font-size: 1.5rem;
+	transition: width 0.3s ease, padding 0.3s;
+	position: relative;
+}
+
+.sidebar.minimized {
+	width: 60px;
+	padding: 40px 5px;
+}
+.sidebar .sidebar-title { transition: opacity 0.3s; }
+.sidebar.minimized .sidebar-title { opacity: 0; }
+.sidebar.minimized .accordion-header,
+.sidebar.minimized .accordion-content {
+	display: none;
+}
+.sidebar.minimized .sidebar-toggle-btn {
+	margin: 0 auto 10px auto;
+}
+.footer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px 40px;
+	background-color: #34495e;
+	border-top: 2px solid #3498db;
+	font-size: 0.95rem;
+	color: #bdc3c7;
+	letter-spacing: 0.5px;
+}
+.footer span { font-weight: 400; font-size: 0.95rem; }
+@media (max-width: 1920px) {
+	body { font-size: 18px; }
+	.title { font-size: 2.2rem; }
+	.footer, .footer span { font-size: 0.85rem; }
+}
+.charts-flex {
+	display: flex;
+	flex-direction: column;
+	gap: 40px;
+	height: 100%;
+	justify-content: flex-start;
+}
+.charts-row {
+	display: flex;
+	flex-direction: row;
+	gap: 40px;
+	justify-content: center;
+	align-items: stretch;
+}
+.small-chart {
+	flex: 1 1 0;
+	max-width: 420px;
+	min-width: 320px;
+	min-height: 320px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+}
+.main-chart {
+	flex: 0 1 auto;
+	padding-bottom: 0;
+	margin-bottom: 0;
+	min-height: 420px;
+	margin-right: 40px;
+	margin-top: 0px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+	border-color: #e74c3c;
+	border-width: 3px;
+}
+.today-chart {
+	flex: 1 1 0;
+	min-width: 320px;
+	max-width: 420px;
+	min-height: 420px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+	border-color: #27ae60;
+	border-width: 3px;
+}
+.today-chart .chart-title {
+	color: #3498db;
+	font-size: 1.5rem;
+}
+.main-chart .chart-title {
+	color: #3498db;
+	font-size: 1.7rem;
+}
+/* Layout visual para TV, focado em imagens de gráficos */
+body {
+	font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	background-color: #2c3e50;
+	color: #ffffff;
+	height: 100vh;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	font-size: 22px;
+}
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px 32px 8px 32px;
+	background-color: #34495e;
+	border-bottom: 2px solid #3498db;
+	min-height: 56px;
+}
+
+.title {
+	font-size: 2.1rem;
+	font-weight: 700;
+	color: #ffffff;
+	text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+	margin: 0;
+}
+
+.datetime {
+	font-size: 2.2rem;
+	font-weight: 500;
+	color: #ecf0f1;
+}
+
+.update-controls-row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 18px;
+}
+
+.update-rate-label {
+	font-size: 1rem;
+	font-weight: 600;
+	color: #bdc3c7;
+	margin-bottom: 0;
+}
+
+.toggle-container {
+	position: relative;
+	display: flex;
+	align-items: center;
+	width: 130px;
+	height: 40px;
+}
+.toggle-input { display: none; }
+.toggle-label {
+	display: flex;
+	align-items: center;
+	background-color: #34495e;
+	border: 2px solid #3498db;
+	border-radius: 25px;
+	padding: 0 10px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	position: relative;
+	width: 130px;
+	height: 40px;
+	user-select: none;
+}
+.toggle-text {
+	font-size: 1rem;
+	font-weight: 600;
+	z-index: 2;
+	transition: color 0.3s ease;
+	width: 50px;
+	text-align: center;
+}
+.toggle-text.left { color: #ffffff; }
+.toggle-text.right { color: #7f8c8d; }
+.toggle-slider {
+	position: absolute;
+	top: 4px;
+	left: 4px;
+	width: 56px;
+	height: 32px;
+	background-color: #3498db;
+	border-radius: 16px;
+	transition: transform 0.3s ease;
+	z-index: 1;
+}
+.toggle-input:checked + .toggle-label .toggle-slider {
+	transform: translateX(54px);
+}
+.toggle-input:checked + .toggle-label .toggle-text.left { color: #7f8c8d; }
+.toggle-input:checked + .toggle-label .toggle-text.right { color: #ffffff; }
+
+.update-now-btn {
+	background-color: #3498db;
+	color: #ffffff;
+	border: none;
+	padding: 10px 22px;
+	border-radius: 8px;
+	font-size: 1.1rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+.update-now-btn:hover {
+	background-color: #217dbb;
+	transform: translateY(-2px);
+	box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+
+
+/* Melhor formatação da área principal abaixo do header */
+.main-content {
+	display: flex;
+	flex: 1 1 0;
+	min-height: 0;
+	min-width: 0;
+	overflow: hidden;
+	background: #2c3e50;
+}
+
+.sidebar {
+	width: 320px;
+	background-color: #34495e;
+	padding: 40px 24px;
+	border-right: 2px solid #3498db;
+	overflow-y: auto;
+	overflow-x: hidden;
+	min-width: 60px;
+	font-size: 1.5rem;
+}
+.sidebar-header {
+	display: flex;
+	align-items: flex-start;
+	flex-direction: row;
+	gap: 0px;
+	margin-bottom: 10;
+	justify-content: flex-start;
+	width: 100%;
+}
+.sidebar-title {
+	font-size: 2.2rem;
+	color: #3498db;
+	border-bottom: 2px solid #3498db;
+	padding-bottom: 0px;
+    margin-top: -8px;
+	margin-bottom: 0;
+	margin-right: 8px;
+	flex: 1 1 0;
+	text-align: left;
+    
+}
+.sidebar-toggle-btn {
+	background: #2980b9;
+	color: #fff;
+	border: none;
+	border-radius: 50%;
+	width: 32px;
+	height: 32px;
+	font-size: 18px;
+	cursor: pointer;
+	margin-left: auto;
+	margin-bottom: 10px;
+	transition: background 0.2s, transform 0.3s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.sidebar-toggle-btn:hover {
+	background: #3498db;
+	transform: scale(1.1);
+}
+.accordion {
+	display: flex-start;
+	flex-direction: column;
+	gap: 6px;
+	margin-top: 0;
+}
+.accordion-item { background: none; border: none; }
+.accordion-header {
+	width: 100%;
+	background: #3498db;
+	color: #fff;
+	border: none;
+	border-radius: 10px;
+	padding: 14px 18px;
+	font-size: 1.3rem;
+	font-weight: 700;
+	cursor: pointer;
+	text-align: left;
+	transition: background 0.2s;
+	margin-bottom: 12px;
+	box-shadow: none;
+	outline: none;
+}
+.accordion-header.active, .accordion-header:hover {
+	background: #2980b9;
+}
+.accordion-content {
+	display: none;
+	padding: 0 0 18px 0;
+	animation: fadeIn 0.3s;
+}
+.accordion-content.open {
+	display: block;
+}
+.filter-select, .date-input {
+	width: 100%;
+	padding: 12px 15px;
+	background-color: #2c3e50;
+	border: 2px solid #3498db;
+	border-radius: 8px;
+	color: #ffffff;
+	font-size: 1.2rem;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	margin-bottom: 10px;
+}
+.checkbox-group, .radio-group {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}
+.checkbox-label, .radio-label {
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+	font-size: 1.2rem;
+	color: #ecf0f1;
+	transition: color 0.3s ease;
+}
+.checkbox-label:hover, .radio-label:hover { color: #3498db; }
+.checkbox-label input[type="checkbox"], .radio-label input[type="radio"] { display: none; }
+.checkmark {
+	width: 20px;
+	height: 20px;
+	border: 2px solid #3498db;
+	border-radius: 4px;
+	margin-right: 12px;
+	position: relative;
+	transition: all 0.3s ease;
+}
+.checkbox-label input[type="checkbox"]:checked + .checkmark { background-color: #3498db; }
+.checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+	content: '✓';
+	position: absolute;
+	top: -2px;
+	left: 3px;
+	color: #ffffff;
+	font-weight: bold;
+	font-size: 14px;
+}
+.radio-mark {
+	width: 20px;
+	height: 20px;
+	border: 2px solid #3498db;
+	border-radius: 50%;
+	margin-right: 12px;
+	position: relative;
+	transition: all 0.3s ease;
+}
+.radio-label input[type="radio"]:checked + .radio-mark { background-color: #3498db; }
+.radio-label input[type="radio"]:checked + .radio-mark::after {
+	content: '';
+	position: absolute;
+	top: 4px;
+	left: 4px;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background-color: #ffffff;
+}
+
+.charts-area {
+	flex: 1 1 0;
+	padding: 80px 40px 40px 40px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: stretch;
+	min-width: 0;
+	min-height: 0;
+	scroll-behavior: smooth;
+}
+.charts-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: 1fr 1fr;
+	gap: 40px;
+	height: 100%;
+}
+.chart-container {
+	background-color: #34495e;
+	border: 2px solid #3498db;
+	border-radius: 12px;
+	padding: 30px;
+	display: flex;
+	flex-direction: column;
+	transition: all 0.3s ease;
+	box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+	align-items: center;
+}
+.chart-container:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+	border-color: #2980b9;
+}
+.main-chart {
+	border-color: #2980b9;
+	border-width: 3px;
+}
+.main-chart:hover { border-color: #3498db; }
+.chart-title {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: #3498db;
+	margin-bottom: 15px;
+	text-align: center;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+.main-chart .chart-title {font-size: 1.7rem; }
+.chart-img {
+	width: 100%;
+	max-width: 800px;
+	height: auto;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+	background: #222;
+}
+
+.footer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20px 60px;
+	background-color: #34495e;
+	border-top: 2px solid #3498db;
+	font-size: 1.3rem;
+	color: #bdc3c7;
+}
+.footer span { font-weight: 500; }
+
+@media (max-width: 1400px) {
+	.title { font-size: 2.5rem; }
+	.datetime { font-size: 1.7rem; }
+	.sidebar { width: 220px; }
+	.chart-title { font-size: 1.1rem; }
+	.charts-area { padding: 20px; }
+	.chart-container { padding: 15px; }
+}
+@media (max-width: 1200px) {
+	.header { padding: 15px 20px; }
+	.title { font-size: 1.7rem; }
+	.sidebar { width: 120px; }
+	.charts-area { padding: 10px; }
+	.chart-container { padding: 8px; }
+}
+/* Ajustes para TV */
+body {
+	font-size: 22px;
+}
+.header, .footer {
+	font-size: 2.2rem;
+}
+.title {
+	font-size: 3.2rem;
+}
+.sidebar {
+	font-size: 1.5rem;
+}
+.sidebar-title {
+	font-size: 2.2rem;
+}
+.accordion-header {
+	font-size: 1.5rem;
+}
+.chart-title {
+	font-size: 1.5rem;
+}
+.main-chart .chart-title {
+	font-size: 1.7rem;
+}
+.update-now-btn {
+	font-size: 1.3rem;
+	padding: 18px 36px;
+}
+.toggle-label {
+	font-size: 1.2rem;
+}
+.filter-select, .date-input {
+	font-size: 1.2rem;
+}
+.checkbox-label, .radio-label {
+	font-size: 1.2rem;
+}
+.charts-area {
+	padding: 40px;
+}
+.charts-grid {
+	gap: 40px;
+}
+.chart-container {
+	padding: 30px;
+}
+@media (max-width: 1920px) {
+	body { font-size: 18px; }
+	.title { font-size: 2.5rem; }
+}
+/* CSS principal do dashboard, pronto para TV. O conteúdo será atualizado na próxima etapa. */
+
+.logo-siri {
+    position: absolute;
+    top: 12px;
+    left: 24px;
+    height: 64px;
+    width: auto;
+    max-width: 80%;
+    z-index: 10;
+    background: none;
+    pointer-events: none;
+    display: block;
+    transform: none;
+}
+
+.logo-nhs {
+    position: absolute;
+    left: 24px;
+    bottom: 24px;
+    height: 46px;
+    width: auto;
+    max-width: 80%;
+    z-index: 10;
+    background: none;
+    pointer-events: none;
+    display: block;
+    transform: none;
+}
+
+/* Para garantir que o container principal seja position: relative */
+body, .main-content {
+    position: relative;
+}
+
+/* Sidebar minimizada por padrão */
+.sidebar.default-closed,
+.sidebar.minimized {
+    width: 60px;
+    padding: 40px 5px;
+}
+
+/* Títulos e textos em azul claro para amarelo */
+.sidebar-title,
+.accordion-header,
+.chart-title,
+.title {
+    color: var(--amarelo-cep) !important;
+}
+
+/* Botão Atualizar Agora amarelo, texto azul escuro */
+.update-now-btn {
+    background-color: var(--amarelo-cep) !important;
+    color: var(--azul-escuro-cep) !important;
+    border: none;
+}
+.update-now-btn:hover {
+    background-color: #e6b800 !important;
+}
+
+/* Switch (toggle) amarelo, texto azul escuro */
+.toggle-label {
+    background-color: var(--amarelo-cep) !important;
+    border: 2px solid var(--amarelo-cep) !important;
+}
+.toggle-slider {
+    background-color: var(--azul-escuro-cep) !important;
+}
+.toggle-text {
+    color: var(--azul-escuro-cep) !important;
+}
+
+/* Textos dos botões de tempo e taxa de atualização no mesmo cinza/branco de última atualização */
+.update-rate-label,
+.update-interval-btn,
+.update-interval-label,
+.datetime {
+    color: #ecf0f1 !important;
+}
+
+/* Taxa de Atualização igual à Última atualização */
+.update-rate-label {
+    color: #bdc3c7 !important;
+    font-weight: 400;
+}
+
+/* Botões 5 min e 15 min em azul escuro */
+.update-interval-btn,
+.toggle-text {
+    color: #1a355e !important;
+    font-weight: 700;
+}
+
+/* Botão 15 min na mesma linha e cor cinza/branco */
+.toggle-label {
+    flex-direction: row !important;
+    color: #bdc3c7 !important;
+}
+.toggle-text {
+    color: #bdc3c7 !important;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    line-height: 1;
+}
+
+/* Botões 5 min e 15 min com borda preta e layout empilhado */
+.toggle-label {
+    border: 2px solid #000 !important;
+    flex-direction: row !important;
+    color: #bdc3c7 !important;
+}
+.toggle-text {
+    color: #bdc3c7 !important;
+    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.1;
+    border: 1px solid #000;
+    border-radius: 8px;
+    padding: 2px 8px;
+    margin: 0 2px;
+    background: transparent;
+}
+.toggle-text span {
+    display: block;
+}
+
+/* Não alterar hamburger nem bordas dos gráficos */
+.accordion-header,
+.sidebar-hamburger-btn,
+.sidebar-hamburger-btn:focus,
+.sidebar-hamburger-btn:active,
+.accordion-header:active,
+.accordion-header:focus,
+.accordion-header:visited,
+.accordion-header:link,
+.accordion-header,
+button.accordion-header,
+button.accordion-header:focus,
+button.accordion-header:active {
+    background: var(--azul-escuro-cep) !important;
+    color: var(--amarelo-cep) !important;
+    border: none;
+}
+.accordion-header:hover,
+.sidebar-hamburger-btn:hover {
+    background: var(--azul-escuro-hover) !important;
+}
+
+/* Botões de filtro */
+.accordion-item > .accordion-header {
+    background: var(--azul-escuro-cep) !important;
+    color: var(--amarelo-cep) !important;
+}
+.accordion-item > .accordion-header:hover {
+    background: var(--azul-escuro-hover) !important;
+}
+
+/* Switch customizado para 5 min e 15 min */
+.toggle-label {
+    background: var(--azul-escuro-hover) !important;
+    border: 2px solid var(--azul-escuro-cep) !important;
+    border-radius: 25px;
+    padding: 0 10px;
+    width: 110px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: background 0.3s;
+    flex-direction: row !important;
+    color: var(--amarelo-cep) !important;
+}
+.toggle-text {
+    color: var(--amarelo-cep) !important;
+    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.1;
+    font-size: 1.1rem;
+    border: none;
+    background: transparent;
+    margin: 0 2px;
+    padding: 0;
+}
+.toggle-text span {
+    display: block;
+    font-size: 0.9em;
+    font-weight: 400;
+}
+.toggle-slider {
+    background: var(--azul-escuro-cep) !important;
+    border-radius: 16px;
+    width: 48px;
+    height: 36px;
+    margin: 0 4px;
+    transition: transform 0.3s;
+    z-index: 1;
+}
+.toggle-input:checked + .toggle-label .toggle-slider {
+    transform: translateX(54px);
+}
+
+/* Remove estilos antigos conflitantes */
+.update-interval-btn,
+.update-interval-label {
+    color: var(--amarelo-cep) !important;
+    background: none !important;
+    border: none !important;
+}
+
+/* Switch: número em cima, 'min' embaixo */
+.toggle-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--amarelo-cep) !important;
+    font-weight: 700;
+    line-height: 1.1;
+    font-size: 1.1rem;
+    border: none;
+    background: transparent;
+    margin: 0 2px;
+    padding: 0;
+}
+.toggle-number {
+    font-size: 1.1em;
+    font-weight: 700;
+    line-height: 1;
+}
+.min-label {
+    font-size: 0.9em;
+    font-weight: 400;
+    margin-top: -2px;
+    line-height: 1;
+}
