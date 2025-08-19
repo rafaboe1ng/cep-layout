@@ -822,16 +822,35 @@ button.accordion-header:active {
 .table-container {
     width: 100%;
     overflow-x: auto;
+<<<<<<< codex/formatar-tabelas-para-caber-na-tela-bhljlk
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-container table {
+=======
 }
 
 table {
+>>>>>>> main
     width: 100%;
     border-collapse: collapse;
 }
 
+<<<<<<< codex/formatar-tabelas-para-caber-na-tela-bhljlk
+.table-container th,
+.table-container td {
+    padding: 8px;
+    text-align: left;
+}
+
+@media (max-width: 600px) {
+    .table-container th,
+    .table-container td {
+=======
 @media (max-width: 600px) {
     table th,
     table td {
+>>>>>>> main
         font-size: 0.9rem;
         word-break: break-word;
     }
