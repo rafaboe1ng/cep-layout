@@ -365,19 +365,24 @@ body {
 	display: block;
 }
 .filter-select, .date-input {
-	width: 100%;
-	padding: 12px 15px;
-	background-color: #2c3e50;
-	border: 2px solid #3498db;
-	border-radius: 8px;
-	color: #ffffff;
-	font-size: 1.2rem;
-	cursor: pointer;
-	transition: all 0.3s ease;
-	margin-bottom: 10px;
+        width: 100%;
+        padding: 12px 15px;
+        background-color: #2c3e50;
+        border: 2px solid #3498db;
+        border-radius: 8px;
+        color: #ffffff;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 10px;
+}
+.custom-date-range {
+        display: none;
+        flex-direction: column;
+        gap: 10px;
 }
 .checkbox-group, .radio-group {
-	display: flex;
+        display: flex;
 	flex-direction: column;
 	gap: 15px;
 }

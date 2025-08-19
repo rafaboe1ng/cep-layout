@@ -41,19 +41,27 @@
 				<div class="accordion-item">
 					<button class="accordion-header" type="button">Data</button>
 					<div class="accordion-content">
-						<select id="dateFilter" class="filter-select">
-							<option value="year" selected>Ano Inteiro</option>
-							<option value="month">Último Mês</option>
-							<option value="week">Última Semana</option>
-							<option value="custom">Personalizado</option>
-						</select>
-						<div id="customDateRange" class="custom-date-range" style="display: none;">
-							<input type="date" id="startDate" class="date-input">
-							<input type="date" id="endDate" class="date-input">
-						</div>
-					</div>
-				</div>
-				<div class="accordion-item">
+                                                <select id="dateFilter" class="filter-select">
+                                                        <option value="today" selected>Hoje</option>
+                                                        <option value="yesterday">Ontem</option>
+                                                        <option value="last3">Últimos 3 Dias</option>
+                                                        <option value="last7">Últimos 7 Dias</option>
+                                                        <option value="last30">Últimos 30 Dias</option>
+                                                        <option value="currentWeek">Semana Atual</option>
+                                                        <option value="previousWeek">Semana Anterior</option>
+                                                        <option value="currentMonth">Mês Atual</option>
+                                                        <option value="previousMonth">Mês Anterior</option>
+                                                        <option value="currentYear">Ano Atual</option>
+                                                        <option value="previousYear">Ano Anterior</option>
+                                                        <option value="custom">Personalizado</option>
+                                                </select>
+                                                <div id="customDateRange" class="custom-date-range">
+                                                        <input type="date" id="startDate" class="date-input">
+                                                        <input type="date" id="endDate" class="date-input">
+                                                </div>
+                                        </div>
+                                </div>
+                                <div class="accordion-item">
 					<button class="accordion-header" type="button">Células</button>
 					<div class="accordion-content">
 						<div class="checkbox-group">
