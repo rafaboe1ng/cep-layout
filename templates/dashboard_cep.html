@@ -97,11 +97,31 @@
         <div class="accordion-item">
           <button class="accordion-header" type="button">Tipo de Defeito</button>
           <div class="accordion-content">
-            <div class="checkbox-group">
-              <label class="checkbox-label"><input type="checkbox" id="defeito1" checked> Fiação com solda fria</label>
-              <label class="checkbox-label"><input type="checkbox" id="defeito2" checked> Respingo de solda</label>
-              <label class="checkbox-label"><input type="checkbox" id="defeito3" checked> Curto por solda</label>
-            </div>
+            <select id="defectFilter" class="filter-select" multiple size="8">
+              <option value="0603 - Fiação com solda fria">0603 - Fiação com solda fria</option>
+              <option value="0002 - Respingo de Solda">0002 - Respingo de Solda</option>
+              <option value="0001 - Curto por Solda">0001 - Curto por Solda</option>
+              <option value="0601 - Fiação invertida">0601 - Fiação invertida</option>
+              <option value="1002 - Outros">1002 - Outros</option>
+              <option value="0802 - Parafuso sem aperto">0802 - Parafuso sem aperto</option>
+              <option value="0401 - Gabinete danificado">0401 - Gabinete danificado</option>
+              <option value="0402 - Gabinete mal encaixado">0402 - Gabinete mal encaixado</option>
+              <option value="0604 - Fiação sem solda">0604 - Fiação sem solda</option>
+              <option value="0003 - Resto de terminal">0003 - Resto de terminal</option>
+              <option value="0502 - Componente danificado">0502 - Componente danificado</option>
+              <option value="0505 - Componente faltando">0505 - Componente faltando</option>
+              <option value="0702 - Abraçadeira faltando">0702 - Abraçadeira faltando</option>
+              <option value="0603 - Componente com solda fria">0603 - Componente com solda fria</option>
+              <option value="1001 - Sem etiqueta">1001 - Sem etiqueta</option>
+              <option value="0201 - Tráfo com barulho">0201 - Tráfo com barulho</option>
+              <option value="0602 - Componente invertido">0602 - Componente invertido</option>
+              <option value="0501 - Fiação danificada">0501 - Fiação danificada</option>
+              <option value="0701 - Amarração errada">0701 - Amarração errada</option>
+              <option value="0803 - Parafuso faltando">0803 - Parafuso faltando</option>
+              <option value="0301 - Bateria danificada">0301 - Bateria danificada</option>
+              <option value="0405 - Botão montado errado">0405 - Botão montado errado</option>
+              <option value="0902 - Cabo Flat invertido">0902 - Cabo Flat invertido</option>
+            </select>
           </div>
         </div>
         <div class="accordion-item">
@@ -128,15 +148,15 @@
               <div class="top3-title">TOP 3 DEFEITOS</div>
               <div class="top3-row">
                 <div class="chart-item chart-small">
-                  <h4 class="chart-title">FIAÇÃO COM SOLDA FRIA</h4>
+                  <h4 class="chart-title">0603 - Fiação com solda fria</h4>
                   <div class="grafico-grid"></div>
                 </div>
                 <div class="chart-item chart-small">
-                  <h4 class="chart-title">RESPINGO DE SOLDA</h4>
+                  <h4 class="chart-title">0002 - Respingo de Solda</h4>
                   <div class="grafico-grid"></div>
                 </div>
                 <div class="chart-item chart-small">
-                  <h4 class="chart-title">CURTO POR SOLDA</h4>
+                  <h4 class="chart-title">0001 - Curto por Solda</h4>
                   <div class="grafico-grid"></div>
                 </div>
               </div>
@@ -148,7 +168,7 @@
       <section class="snap-page">
         <section class="charts-area no-scroll">
           <div class="charts-grid-custom">
-            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;">Nova Página</div>
+            <div id="selectedDefectsContainer" class="selected-defects-grid"></div>
           </div>
         </section>
       </section>

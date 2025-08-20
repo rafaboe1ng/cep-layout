@@ -428,6 +428,19 @@ body {
   margin: 0;
 }
 
+.selected-defects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-auto-rows: 1fr;
+  gap: 16px;
+  width: 100%;
+  height: 100%;
+}
+
+.selected-defects-grid .chart-item {
+  height: 100%;
+}
+
 .chart-small {
   flex: 1 1 0;
   width: 100%;

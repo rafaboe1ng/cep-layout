@@ -28,4 +28,25 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleCustomRange();
     dateSelect.addEventListener('change', toggleCustomRange);
   }
+
+  // Atualiza gráficos conforme defeitos selecionados
+  const defectSelect = document.getElementById('defectFilter');
+  const selectedContainer = document.getElementById('selectedDefectsContainer');
+  if (defectSelect && selectedContainer) {
+    defectSelect.addEventListener('change', () => {
+      selectedContainer.innerHTML = '';
+      Array.from(defectSelect.selectedOptions).forEach(opt => {
+        const box = document.createElement('div');
+        box.className = 'chart-item chart-small';
+        const title = document.createElement('h4');
+        title.className = 'chart-title';
+        title.textContent = opt.value;
+        box.appendChild(title);
+        const grid = document.createElement('div');
+        grid.className = 'grafico-grid';
+        box.appendChild(grid);
+        selectedContainer.appendChild(box);
+      });
+    });
+  }
 });
