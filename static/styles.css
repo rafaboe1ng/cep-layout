@@ -150,6 +150,7 @@ body {
   max-width: 100%;
 }
 
+
 .sidebar {
   width: 320px;
   background: var(--panel-bg);
@@ -157,16 +158,16 @@ body {
   padding: 0 12px 24px;
   overflow-y: auto;
   transition: width .3s;
+  position: relative;
 }
 
 .sidebar.minimized {
   width: 60px;
-  padding: 40px 5px;
+  padding: 0 5px 24px;
 }
 
 /* Esconde todos os textos e controles da sidebar quando minimizada */
 .sidebar.minimized .sidebar-title,
-.sidebar.minimized .sidebar-nav-btn,
 .sidebar.minimized .accordion-header,
 .sidebar.minimized .accordion-content,
 .sidebar.minimized .checkbox-label,
@@ -195,8 +196,9 @@ body {
   color: var(--yellow);
   cursor: pointer;
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 10px;
+  left: 10px;
+  transform: none;
   z-index: 2;
 }
 
@@ -268,6 +270,10 @@ body {
   font-size: 1rem;
 }
 
+.checkbox-label {
+  color: #fff;
+}
+
 .charts-area {
   flex: 1;
   overflow: auto;
@@ -301,21 +307,55 @@ body {
   position: relative;
 }
 
-/* Botão redondo para navegação entre páginas */
+/* Botão de navegação entre páginas - seta minimalista */
 .sidebar-nav-btn {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
   border: none;
-  background: var(--blue-dark);
-  color: var(--yellow);
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 10px;
-  font-size: 1.75rem;
   cursor: pointer;
-  transition: background 0.2s;
+  position: absolute;
+  top: 50%;
+  right: -12px;
+  transform: translateY(-50%);
+  padding: 0;
+}
+
+.sidebar-nav-icon {
+  position: relative;
+  width: 14px;
+  height: 14px;
+}
+
+.sidebar-nav-icon::before,
+.sidebar-nav-icon::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 2px;
+  background: #3498db;
+  transition: transform 0.2s;
+}
+
+.sidebar-nav-icon::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.sidebar-nav-icon::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.sidebar-nav-icon.up::before {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.sidebar-nav-icon.up::after {
+  transform: translate(-50%, -50%) rotate(45deg);
 }
 
 .snap-page {
