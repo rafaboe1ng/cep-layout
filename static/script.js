@@ -30,23 +30,27 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Atualiza gráficos conforme defeitos selecionados
-  const defectSelect = document.getElementById('defectFilter');
+  const defectContainer = document.getElementById('defectFilter');
   const selectedContainer = document.getElementById('selectedDefectsContainer');
-  if (defectSelect && selectedContainer) {
-    defectSelect.addEventListener('change', () => {
+  if (defectContainer && selectedContainer) {
+    const checkboxes = defectContainer.querySelectorAll('input[type="checkbox"]');
+    function updateSelected() {
       selectedContainer.innerHTML = '';
-      Array.from(defectSelect.selectedOptions).forEach(opt => {
-        const box = document.createElement('div');
-        box.className = 'chart-item chart-small';
-        const title = document.createElement('h4');
-        title.className = 'chart-title';
-        title.textContent = opt.value;
-        box.appendChild(title);
-        const grid = document.createElement('div');
-        grid.className = 'grafico-grid';
-        box.appendChild(grid);
-        selectedContainer.appendChild(box);
+      checkboxes.forEach(cb => {
+        if (cb.checked) {
+          const box = document.createElement('div');
+          box.className = 'chart-item chart-small';
+          const title = document.createElement('h4');
+          title.className = 'chart-title';
+          title.textContent = cb.value;
+          box.appendChild(title);
+          const grid = document.createElement('div');
+          grid.className = 'grafico-grid';
+          box.appendChild(grid);
+          selectedContainer.appendChild(box);
+        }
       });
-    });
+    }
+    checkboxes.forEach(cb => cb.addEventListener('change', updateSelected));
   }
 });
