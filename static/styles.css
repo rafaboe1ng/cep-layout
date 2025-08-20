@@ -422,6 +422,11 @@ body {
   height: 100%;
 }
 
+.selected-defect {
+  border: 3px solid var(--yellow);
+  cursor: pointer;
+}
+
 .chart-small {
   flex: 1 1 0;
   width: 100%;

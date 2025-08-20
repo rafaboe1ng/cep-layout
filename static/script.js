@@ -33,26 +33,39 @@ document.addEventListener('DOMContentLoaded', () => {
   const defectSelect = document.getElementById('defectFilter');
   const selectedContainer = document.getElementById('selectedDefectsContainer');
   if (defectSelect && selectedContainer) {
-    function updateSelected() {
-      selectedContainer.innerHTML = '';
-      if (defectSelect.value) {
+    const selectedDefects = new Map();
+
+    defectSelect.addEventListener('change', () => {
+      const value = defectSelect.value;
+      if (value && !selectedDefects.has(value)) {
         const box = document.createElement('div');
-        box.className = 'chart-item chart-small';
+        box.className = 'chart-item chart-small selected-defect';
         const title = document.createElement('h4');
         title.className = 'chart-title';
-        title.textContent = defectSelect.value;
+        title.textContent = value;
         box.appendChild(title);
         const grid = document.createElement('div');
         grid.className = 'grafico-grid';
         box.appendChild(grid);
+
+        box.addEventListener('click', () => {
+          selectedContainer.removeChild(box);
+          selectedDefects.delete(value);
+        });
+
         selectedContainer.appendChild(box);
+        selectedDefects.set(value, box);
       }
-    }
-    defectSelect.addEventListener('change', () => {
-      updateSelected();
+
+      defectSelect.value = '';
       const content = defectSelect.closest('.accordion-content');
       if (content) {
         content.classList.remove('open');
+      }
+
+      const sidebar = document.getElementById('sidebar');
+      if (sidebar) {
+        sidebar.classList.remove('minimized');
       }
     });
   }
