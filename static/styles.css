@@ -157,6 +157,7 @@ body {
   padding: 0 12px 24px;
   overflow-y: auto;
   transition: width .3s;
+  position: relative;
 }
 
 .sidebar.minimized {
@@ -166,7 +167,6 @@ body {
 
 /* Esconde todos os textos e controles da sidebar quando minimizada */
 .sidebar.minimized .sidebar-title,
-.sidebar.minimized .sidebar-nav-btn,
 .sidebar.minimized .accordion-header,
 .sidebar.minimized .accordion-content,
 .sidebar.minimized .checkbox-label,
@@ -194,10 +194,11 @@ body {
   background: transparent;
   color: var(--yellow);
   cursor: pointer;
-  position: absolute;
+  position: fixed;
+  left: 10px;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 2;
+  z-index: 1000;
 }
 
 .hamburger-bar {
@@ -206,6 +207,30 @@ body {
   background: #3498db;
   border-radius: 2px;
   margin: 3px 0;
+}
+
+.sidebar-nav-btn {
+  position: absolute;
+  right: -22px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.nav-arrow {
+  border: solid #3498db;
+  border-width: 0 4px 4px 0;
+  display: inline-block;
+  padding: 6px;
+  transform: rotate(45deg);
+}
+
+.sidebar-nav-btn.up .nav-arrow {
+  transform: rotate(-135deg);
 }
 
 .sidebar-title {
@@ -266,6 +291,7 @@ body {
   align-items: center;
   gap: 6px;
   font-size: 1rem;
+  color: #fff;
 }
 
 .charts-area {
