@@ -195,11 +195,11 @@ body {
   background: transparent;
   color: var(--yellow);
   cursor: pointer;
-  position: absolute;
-  top: 10px;
-  left: 10px;
+  position: fixed;
+  top: 66px;
+  left: 22px;
   transform: none;
-  z-index: 2;
+  z-index: 1000;
 }
 
 .hamburger-bar {
@@ -270,7 +270,8 @@ body {
   font-size: 1rem;
 }
 
-.checkbox-label {
+.checkbox-label,
+.radio-label {
   color: #fff;
 }
 
@@ -324,11 +325,9 @@ body {
 }
 
 .sidebar-nav-icon {
-  width: 0;
-  height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top: 12px solid var(--yellow);
+  width: 24px;
+  height: 24px;
+  color: var(--yellow);
   transition: transform 0.2s;
 }
 
