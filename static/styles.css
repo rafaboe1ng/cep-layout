@@ -50,6 +50,7 @@
   --panel-bg: #34495e;
   --body-bg: #2c3e50;
   --text-light: #ecf0f1;
+  --grafico-box-border: #8fd6ff;
 }
 
 * {
@@ -286,11 +287,12 @@ body {
 }
 
 .snap-container {
-  height: 100vh;
-  width: 100vw;
+  flex: 1;
+  height: 100%;
+  width: 100%;
   overflow: hidden;
   scroll-snap-type: y mandatory;
-  max-width: 100vw;
+  max-width: 100%;
 }
 .sidebar-header {
   display: flex;
@@ -317,8 +319,8 @@ body {
 }
 
 .snap-page {
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
   scroll-snap-align: start;
   display: flex;
   flex-direction: column;
