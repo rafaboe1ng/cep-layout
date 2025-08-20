@@ -197,7 +197,7 @@ body {
   cursor: pointer;
   position: fixed;
   top: 66px;
-  left: 22px;
+  left: 11px;
   transform: none;
   z-index: 1000;
 }
@@ -320,7 +320,7 @@ body {
   cursor: pointer;
   position: absolute;
   top: 20px;
-  right: -18px;
+  right: 0;
   padding: 0;
 }
 
