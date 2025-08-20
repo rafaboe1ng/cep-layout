@@ -63,10 +63,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const placeRow = (startIdx, n, row) => {
         if (n === 0) return;
         const baseSpan = Math.floor(cols / n) || 1;
+        let leftover = cols - baseSpan * n;
         let colStart = 1;
         for (let i = 0; i < n; i++) {
           const item = items[startIdx + i];
-          const span = i === n - 1 ? cols - colStart + 1 : baseSpan;
+          let span = baseSpan;
+          if (leftover > 0) {
+            span += 1;
+            leftover -= 1;
+          }
           item.style.gridRow = String(row);
           item.style.gridColumn = `${colStart} / span ${span}`;
           colStart += span;
