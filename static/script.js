@@ -35,6 +35,48 @@ document.addEventListener('DOMContentLoaded', () => {
   if (defectSelect && selectedContainer) {
     const selectedDefects = new Map();
 
+    function updateLayout() {
+      const items = Array.from(selectedContainer.querySelectorAll('.selected-defect'));
+      const count = items.length;
+
+      if (count === 0) {
+        selectedContainer.style.gridTemplateColumns = '';
+        selectedContainer.style.gridTemplateRows = '';
+        return;
+      }
+
+      let top, bottom;
+      if (count % 2 === 0) {
+        top = bottom = count / 2;
+      } else if (count >= 3) {
+        top = Math.floor(count / 2);
+        bottom = count - top;
+      } else {
+        top = count;
+        bottom = 0;
+      }
+
+      const cols = Math.max(top, bottom);
+      selectedContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+      selectedContainer.style.gridTemplateRows = bottom > 0 ? '1fr 1fr' : '1fr';
+
+      const placeRow = (startIdx, n, row) => {
+        if (n === 0) return;
+        const baseSpan = Math.floor(cols / n) || 1;
+        let colStart = 1;
+        for (let i = 0; i < n; i++) {
+          const item = items[startIdx + i];
+          const span = i === n - 1 ? cols - colStart + 1 : baseSpan;
+          item.style.gridRow = String(row);
+          item.style.gridColumn = `${colStart} / span ${span}`;
+          colStart += span;
+        }
+      };
+
+      placeRow(0, top, 1);
+      placeRow(top, bottom, 2);
+    }
+
     defectSelect.addEventListener('change', () => {
       const value = defectSelect.value;
       if (value && !selectedDefects.has(value)) {
@@ -51,10 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
         box.addEventListener('click', () => {
           selectedContainer.removeChild(box);
           selectedDefects.delete(value);
+          updateLayout();
         });
 
         selectedContainer.appendChild(box);
         selectedDefects.set(value, box);
+        updateLayout();
       }
 
       defectSelect.value = '';
