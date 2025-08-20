@@ -1,13 +1,3 @@
-.sidebar-title-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-left: 48px;
-}
-/* Esconde o título e botão juntos quando minimizado */
-.sidebar.minimized .sidebar-title-row {
-  display: none;
-}
 /* Borda azul bebê para o grid do gráfico */
 .grafico-grid {
   width: 100%;
@@ -167,7 +157,9 @@ body {
 }
 
 /* Esconde todos os textos e controles da sidebar quando minimizada */
+
 .sidebar.minimized .sidebar-title,
+.sidebar.minimized .sidebar-nav-btn,
 .sidebar.minimized .accordion-header,
 .sidebar.minimized .accordion-content,
 .sidebar.minimized .checkbox-label,
@@ -180,6 +172,8 @@ body {
 .sidebar-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin: 0;
   position: relative;
 }
@@ -195,11 +189,6 @@ body {
   background: transparent;
   color: var(--yellow);
   cursor: pointer;
-  position: fixed;
-  top: 66px;
-  left: 11px;
-  transform: none;
-  z-index: 1000;
 }
 
 .hamburger-bar {
@@ -213,7 +202,9 @@ body {
 .sidebar-title {
   font-size: 1.3rem;
   color: var(--yellow);
-  margin-left: 48px;
+  margin: 0;
+  flex: 1;
+  text-align: center;
 }
 
 .accordion-item {
@@ -301,13 +292,6 @@ body {
   scroll-snap-type: y mandatory;
   max-width: 100%;
 }
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  margin: 0;
-  position: relative;
-}
-
 /* Botão de navegação entre páginas - seta minimalista */
 .sidebar-nav-btn {
   width: 36px;
@@ -318,10 +302,7 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  position: absolute;
-  top: 20px;
-  right: 0;
-  padding: 0;
+  margin-left: auto;
 }
 
 .sidebar-nav-icon {
