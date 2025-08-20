@@ -58,15 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       defectSelect.value = '';
-      const content = defectSelect.closest('.accordion-content');
-      if (content) {
-        content.classList.remove('open');
-      }
-
-      const sidebar = document.getElementById('sidebar');
-      if (sidebar) {
-        sidebar.classList.remove('minimized');
-      }
     });
   }
 });
