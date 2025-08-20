@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const sidebar = document.getElementById('sidebar');
   const hamburgerSidebarBtn = document.getElementById('hamburgerSidebarBtn');
   if (hamburgerSidebarBtn) {
-    hamburgerSidebarBtn.addEventListener('click', () => {
+    hamburgerSidebarBtn.addEventListener('click', function () {
       sidebar.classList.toggle('minimized');
     });
   }
@@ -13,4 +13,19 @@ document.addEventListener('DOMContentLoaded', () => {
       content.classList.toggle('open');
     });
   });
+
+  // Mostrar custom-date-range só se for Personalizado
+  const dateSelect = document.getElementById('dateFilter');
+  const customRange = document.getElementById('customDateRange');
+  function toggleCustomRange() {
+    if (dateSelect.value === 'custom') {
+      customRange.style.display = '';
+    } else {
+      customRange.style.display = 'none';
+    }
+  }
+  if (dateSelect && customRange) {
+    toggleCustomRange();
+    dateSelect.addEventListener('change', toggleCustomRange);
+  }
 });

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -7,9 +8,8 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-  <img src="{{ url_for('static', filename='logo_siri_no_text.png') }}" alt="Logo Siri" class="logo-siri">
-
   <header class="header">
+    <img src="{{ url_for('static', filename='/img/logo_siri_no_text.png') }}" alt="Logo Siri" class="logo-siri" />
     <h1 class="title"><span class="cep-yellow">CONTROLE ESTATÍSTICO DE PROCESSO</span></h1>
     <div class="header-right">
       <div class="update-controls-row">
@@ -20,8 +20,7 @@
       </div>
     </div>
   </header>
-
-  <main class="main-content">
+  <div class="main-content">
     <aside class="sidebar minimized" id="sidebar">
       <div class="sidebar-header">
         <button id="hamburgerSidebarBtn" class="sidebar-hamburger-btn" title="Abrir/Fechar Sidebar" aria-label="Abrir/Fechar Sidebar">
@@ -29,7 +28,32 @@
           <span class="hamburger-bar"></span>
           <span class="hamburger-bar"></span>
         </button>
-        <h3 class="sidebar-title">Filtros</h3>
+        <div class="sidebar-title-row">
+          <h3 class="sidebar-title">Filtros</h3>
+          <button class="sidebar-nav-btn" id="sidebarNavBtn" title="Navegar página" onclick="togglePage()">
+            <span id="sidebarNavIcon">&#8595;</span>
+          </button>
+        </div>
+  <script>
+    // Alterna seta do botão de navegação conforme página e faz scroll
+    let onTopPage = true;
+    function updateSidebarNavIcon(isTop) {
+      document.getElementById('sidebarNavIcon').innerHTML = isTop ? '\u2193' : '\u2191';
+    }
+    function togglePage() {
+      const container = document.querySelector('.snap-container');
+      if (onTopPage) {
+        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+        updateSidebarNavIcon(false);
+      } else {
+        container.scrollTo({ top: 0, behavior: 'smooth' });
+        updateSidebarNavIcon(true);
+      }
+      onTopPage = !onTopPage;
+    }
+    // Inicializa seta para baixo
+    updateSidebarNavIcon(true);
+  </script>
       </div>
       <div class="accordion">
         <div class="accordion-item">
@@ -69,49 +93,73 @@
           <button class="accordion-header" type="button">Dias de Inspeção</button>
           <div class="accordion-content">
             <div class="radio-group">
-              <label class="radio-label"><input type="radio" name="inspectionDays" value="with" checked> Apenas dias com mais de 10 inspeções</label>
+              <label class="radio-label"><input type="radio" name="inspectionDays" value="with" checked> Dias com mais de 10 inspeções</label>
               <label class="radio-label"><input type="radio" name="inspectionDays" value="all"> Incluir dias com menos de 10 inspeções</label>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <button class="accordion-header" type="button">Tipo de Defeito</button>
+          <div class="accordion-content">
+            <div class="checkbox-group">
+              <label class="checkbox-label"><input type="checkbox" id="defeito1" checked> Fiação com solda fria</label>
+              <label class="checkbox-label"><input type="checkbox" id="defeito2" checked> Respingo de solda</label>
+              <label class="checkbox-label"><input type="checkbox" id="defeito3" checked> Curto por solda</label>
             </div>
           </div>
         </div>
       </div>
     </aside>
-
-    <section class="charts-area">
-      <div class="charts-grid-responsive">
-        <div class="chart-item main-chart">
-          <h4 class="chart-title">DEFEITOS - HOJE</h4>
-          <img src="{{ url_for('static', filename='top6-defeitos.png') }}" class="chart-img" alt="Top 6 Defeitos">
-        </div>
-        <div class="chart-item today-chart">
-          <h4 class="chart-title">TODOS OS DEFEITOS</h4>
-          <img src="{{ url_for('static', filename='exemplo.png') }}" class="chart-img" alt="Defeitos Hoje">
-        </div>
-        <div class="top3-title">TOP 3 DEFEITOS</div>
-        <div class="chart-item small-chart">
-          <h4 class="chart-title">FIAÇÃO COM SOLDA FRIA</h4>
-          <img src="{{ url_for('static', filename='exemplo.png') }}" class="chart-img" alt="Fiação com Solda Fria">
-        </div>
-        <div class="chart-item small-chart">
-          <h4 class="chart-title">RESPINGO DE SOLDA</h4>
-          <img src="{{ url_for('static', filename='exemplo.png') }}" class="chart-img" alt="Respingo de Solda">
-        </div>
-        <div class="chart-item small-chart">
-          <h4 class="chart-title">CURTO POR SOLDA</h4>
-          <img src="{{ url_for('static', filename='exemplo.png') }}" class="chart-img" alt="Curto por Solda">
-        </div>
-      </div>
-    </section>
-  </main>
-
+    <div class="snap-container">
+      <!-- Página 1: Dashboard -->
+      <section class="snap-page">
+        <section class="charts-area no-scroll">
+          <div class="charts-grid-custom">
+            <div class="chart-item chart-hoje">
+              <h4 class="chart-title">DEFEITOS - HOJE</h4>
+              <div class="grafico-grid"></div>
+            </div>
+            <div class="chart-item chart-todos">
+              <h4 class="chart-title">TODOS OS DEFEITOS</h4>
+              <div class="grafico-grid"></div>
+            </div>
+            <div class="top3-area">
+              <div class="top3-title">TOP 3 DEFEITOS</div>
+              <div class="top3-row">
+                <div class="chart-item chart-small">
+                  <h4 class="chart-title">FIAÇÃO COM SOLDA FRIA</h4>
+                  <div class="grafico-grid"></div>
+                </div>
+                <div class="chart-item chart-small">
+                  <h4 class="chart-title">RESPINGO DE SOLDA</h4>
+                  <div class="grafico-grid"></div>
+                </div>
+                <div class="chart-item chart-small">
+                  <h4 class="chart-title">CURTO POR SOLDA</h4>
+                  <div class="grafico-grid"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+      <!-- Página 2: Conteúdo extra -->
+      <section class="snap-page">
+        <section class="charts-area no-scroll">
+          <div class="charts-grid-custom">
+            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;">Nova Página</div>
+          </div>
+        </section>
+      </section>
+    </div>
+  </div>
   <footer class="footer">
-    <img src="{{ url_for('static', filename='logo_nhs_branca.png') }}" alt="Logo NHS" class="logo-nhs">
+    <img src="{{ url_for('static', filename='/img/logo_nhs_branca.png') }}" alt="Logo NHS" class="logo-nhs">
     <div class="footer-right">
       <span id="totalInspections">Inspeções: 95</span>
       <span id="totalDefects">Defeitos: 20</span>
     </div>
   </footer>
-
   <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </body>
 </html>
