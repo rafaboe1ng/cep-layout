@@ -69,7 +69,7 @@ html, body {
 
 body {
   margin: 0;
-  border: 3px solid var(--grafico-box-border); /* Alterando a cor da borda para azul bebê */
+  /* border: 3px solid var(--grafico-box-border); */
   background: var(--body-bg);
   height: 100vh;
   display: flex;
