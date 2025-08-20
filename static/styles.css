@@ -268,9 +268,6 @@ body {
   align-items: center;
   gap: 6px;
   font-size: 1rem;
-}
-
-.checkbox-label {
   color: #fff;
 }
 
@@ -326,8 +323,8 @@ body {
 
 .sidebar-nav-icon {
   position: relative;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
 }
 
 .sidebar-nav-icon::before,
@@ -335,27 +332,30 @@ body {
   content: "";
   position: absolute;
   top: 50%;
-  left: 50%;
-  width: 12px;
-  height: 2px;
+  width: 10px;
+  height: 3px;
   background: #3498db;
   transition: transform 0.2s;
 }
 
 .sidebar-nav-icon::before {
-  transform: translate(-50%, -50%) rotate(45deg);
+  left: 0;
+  transform-origin: left center;
+  transform: translateY(-50%) rotate(45deg);
 }
 
 .sidebar-nav-icon::after {
-  transform: translate(-50%, -50%) rotate(-45deg);
+  right: 0;
+  transform-origin: right center;
+  transform: translateY(-50%) rotate(-45deg);
 }
 
 .sidebar-nav-icon.up::before {
-  transform: translate(-50%, -50%) rotate(-45deg);
+  transform: translateY(-50%) rotate(-45deg);
 }
 
 .sidebar-nav-icon.up::after {
-  transform: translate(-50%, -50%) rotate(45deg);
+  transform: translateY(-50%) rotate(45deg);
 }
 
 .snap-page {
