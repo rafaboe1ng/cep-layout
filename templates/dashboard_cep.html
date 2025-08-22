@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard CEP</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
@@ -12,9 +13,9 @@
     <img src="{{ url_for('static', filename='/img/logo_siri_no_text.png') }}" alt="Logo Siri" class="logo-siri" />
     <h1 class="title"><span class="cep-yellow">CONTROLE ESTATÍSTICO DE PROCESSO</span></h1>
     <div class="header-right">
-      <div class="update-controls-row">
-        <button class="update-now-btn" id="updateNowBtn">Atualizar Agora</button>
-      </div>
+        <div class="update-controls-row">
+          <button class="btn btn-warning update-now-btn" id="updateNowBtn">Atualizar Agora</button>
+        </div>
       <div class="last-update-label">
         <span id="lastUpdate">Última atualização:</span>
       </div>
@@ -58,72 +59,93 @@
     updateSidebarNavIcon(true);
   </script>
       </header>
-      <div class="accordion">
-        <div class="accordion-item">
-          <button class="accordion-header" type="button">Data</button>
-          <div class="accordion-content">
-            <select id="dateFilter" class="filter-select">
-              <option value="today" selected>Hoje</option>
-              <option value="yesterday">Ontem</option>
-              <option value="last3">Últimos 3 Dias</option>
-              <option value="last7">Últimos 7 Dias</option>
-              <option value="last30">Últimos 30 Dias</option>
-              <option value="currentWeek">Semana Atual</option>
-              <option value="previousWeek">Semana Anterior</option>
-              <option value="currentMonth">Mês Atual</option>
-              <option value="previousMonth">Mês Anterior</option>
-              <option value="currentYear">Ano Atual</option>
-              <option value="previousYear">Ano Anterior</option>
-              <option value="custom">Personalizado</option>
-            </select>
-            <div id="customDateRange" class="custom-date-range">
-              <input type="date" id="startDate" class="date-input">
-              <input type="date" id="endDate" class="date-input">
+        <div class="accordion" id="filterAccordion">
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingDate">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDate" aria-expanded="false" aria-controls="collapseDate">Data</button>
+            </h2>
+            <div id="collapseDate" class="accordion-collapse collapse" aria-labelledby="headingDate" data-bs-parent="#filterAccordion">
+              <div class="accordion-body">
+                <select id="dateFilter" class="form-select filter-select">
+                  <option value="today" selected>Hoje</option>
+                  <option value="yesterday">Ontem</option>
+                  <option value="last3">Últimos 3 Dias</option>
+                  <option value="last7">Últimos 7 Dias</option>
+                  <option value="last30">Últimos 30 Dias</option>
+                  <option value="currentWeek">Semana Atual</option>
+                  <option value="previousWeek">Semana Anterior</option>
+                  <option value="currentMonth">Mês Atual</option>
+                  <option value="previousMonth">Mês Anterior</option>
+                  <option value="currentYear">Ano Atual</option>
+                  <option value="previousYear">Ano Anterior</option>
+                  <option value="custom">Personalizado</option>
+                </select>
+                <div id="customDateRange" class="custom-date-range">
+                  <input type="date" id="startDate" class="form-control date-input">
+                  <input type="date" id="endDate" class="form-control date-input">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingCells">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCells" aria-expanded="false" aria-controls="collapseCells">Células</button>
+            </h2>
+            <div id="collapseCells" class="accordion-collapse collapse" aria-labelledby="headingCells" data-bs-parent="#filterAccordion">
+              <div class="accordion-body">
+                <div class="checkbox-group">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="cell01" checked>
+                    <label class="form-check-label" for="cell01">UPS-01</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="cell02" checked>
+                    <label class="form-check-label" for="cell02">UPS-02</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="cell07" checked>
+                    <label class="form-check-label" for="cell07">UPS-07</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingDefect">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDefect" aria-expanded="false" aria-controls="collapseDefect">Tipo de Defeito</button>
+            </h2>
+            <div id="collapseDefect" class="accordion-collapse collapse" aria-labelledby="headingDefect" data-bs-parent="#filterAccordion">
+              <div class="accordion-body">
+                <select id="defectFilter" class="form-select filter-select">
+                  <option value="">Selecione um defeito</option>
+                  <option value="0001 - Curto por Solda">0001 - Curto por Solda</option>
+                  <option value="0002 - Respingo de Solda">0002 - Respingo de Solda</option>
+                  <option value="0003 - Resto de terminal">0003 - Resto de terminal</option>
+                  <option value="0201 - Tráfo com barulho">0201 - Tráfo com barulho</option>
+                  <option value="0301 - Bateria danificada">0301 - Bateria danificada</option>
+                  <option value="0401 - Gabinete danificado">0401 - Gabinete danificado</option>
+                  <option value="0402 - Gabinete mal encaixado">0402 - Gabinete mal encaixado</option>
+                  <option value="0405 - Botão montado errado">0405 - Botão montado errado</option>
+                  <option value="0501 - Fiação danificada">0501 - Fiação danificada</option>
+                  <option value="0502 - Componente danificado">0502 - Componente danificado</option>
+                  <option value="0505 - Componente faltando">0505 - Componente faltando</option>
+                  <option value="0601 - Fiação invertida">0601 - Fiação invertida</option>
+                  <option value="0602 - Componente invertido">0602 - Componente invertido</option>
+                  <option value="0603 - Fiação com solda fria">0603 - Fiação com solda fria</option>
+                  <option value="0603 - Componente com solda fria">0603 - Componente com solda fria</option>
+                  <option value="0604 - Fiação sem solda">0604 - Fiação sem solda</option>
+                  <option value="0701 - Amarração errada">0701 - Amarração errada</option>
+                  <option value="0702 - Abraçadeira faltando">0702 - Abraçadeira faltando</option>
+                  <option value="0802 - Parafuso sem aperto">0802 - Parafuso sem aperto</option>
+                  <option value="0803 - Parafuso faltando">0803 - Parafuso faltando</option>
+                  <option value="0902 - Cabo Flat invertido">0902 - Cabo Flat invertido</option>
+                  <option value="1001 - Sem etiqueta">1001 - Sem etiqueta</option>
+                  <option value="1002 - Outros">1002 - Outros</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
-        <div class="accordion-item">
-          <button class="accordion-header" type="button">Células</button>
-          <div class="accordion-content">
-            <div class="checkbox-group">
-              <label class="checkbox-label"><input type="checkbox" id="cell01" checked> UPS-01</label>
-              <label class="checkbox-label"><input type="checkbox" id="cell02" checked> UPS-02</label>
-              <label class="checkbox-label"><input type="checkbox" id="cell07" checked> UPS-07</label>
-            </div>
-          </div>
-        </div>
-        <div class="accordion-item">
-          <button class="accordion-header" type="button">Tipo de Defeito</button>
-          <div class="accordion-content">
-            <select id="defectFilter" class="filter-select">
-              <option value="">Selecione um defeito</option>
-              <option value="0001 - Curto por Solda">0001 - Curto por Solda</option>
-              <option value="0002 - Respingo de Solda">0002 - Respingo de Solda</option>
-              <option value="0003 - Resto de terminal">0003 - Resto de terminal</option>
-              <option value="0201 - Tráfo com barulho">0201 - Tráfo com barulho</option>
-              <option value="0301 - Bateria danificada">0301 - Bateria danificada</option>
-              <option value="0401 - Gabinete danificado">0401 - Gabinete danificado</option>
-              <option value="0402 - Gabinete mal encaixado">0402 - Gabinete mal encaixado</option>
-              <option value="0405 - Botão montado errado">0405 - Botão montado errado</option>
-              <option value="0501 - Fiação danificada">0501 - Fiação danificada</option>
-              <option value="0502 - Componente danificado">0502 - Componente danificado</option>
-              <option value="0505 - Componente faltando">0505 - Componente faltando</option>
-              <option value="0601 - Fiação invertida">0601 - Fiação invertida</option>
-              <option value="0602 - Componente invertido">0602 - Componente invertido</option>
-              <option value="0603 - Fiação com solda fria">0603 - Fiação com solda fria</option>
-              <option value="0603 - Componente com solda fria">0603 - Componente com solda fria</option>
-              <option value="0604 - Fiação sem solda">0604 - Fiação sem solda</option>
-              <option value="0701 - Amarração errada">0701 - Amarração errada</option>
-              <option value="0702 - Abraçadeira faltando">0702 - Abraçadeira faltando</option>
-              <option value="0802 - Parafuso sem aperto">0802 - Parafuso sem aperto</option>
-              <option value="0803 - Parafuso faltando">0803 - Parafuso faltando</option>
-              <option value="0902 - Cabo Flat invertido">0902 - Cabo Flat invertido</option>
-              <option value="1001 - Sem etiqueta">1001 - Sem etiqueta</option>
-              <option value="1002 - Outros">1002 - Outros</option>
-            </select>
-          </div>
-        </div>
-      </div>
     </aside>
     <div class="snap-container">
       <!-- Página 1: Dashboard -->
@@ -171,6 +193,7 @@
       <span id="totalDefects">Defeitos: 20</span>
     </div>
   </footer>
-  <script src="{{ url_for('static', filename='script.js') }}" defer></script>
-</body>
-</html>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+  </body>
+  </html>

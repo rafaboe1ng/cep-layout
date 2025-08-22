@@ -207,29 +207,31 @@ body {
   text-align: center;
 }
 
+
 .accordion-item {
   margin-top: 16px;
+  background: var(--panel-bg);
+  border: none;
 }
 
-.accordion-header {
-  width: 100%;
-  text-align: left;
-  padding: 8px 12px;
+.accordion-button {
   background: var(--blue-dark);
   color: var(--yellow);
-  border: none;
-  cursor: pointer;
-  border-radius: 4px;
-  font-weight: bold;
 }
 
-.accordion-content {
-  display: none;
+.accordion-button:not(.collapsed) {
+  background: var(--blue-dark);
+  color: var(--yellow);
+  box-shadow: none;
+}
+
+.accordion-button:focus {
+  box-shadow: none;
+}
+
+.accordion-body {
+  background: var(--panel-bg);
   margin-top: 8px;
-}
-
-.accordion-content.open {
-  display: block;
 }
 
 .filter-select,
@@ -253,18 +255,10 @@ body {
   gap: 6px;
 }
 
-.checkbox-label,
-.radio-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 1rem;
-}
-
-.checkbox-label,
-.radio-label {
+.form-check-label {
   color: #fff;
 }
+
 
 .charts-area {
   flex: 1;
