@@ -134,7 +134,14 @@
           </div>
           <div class="charts-grid-custom">
             <div class="chart-item chart-hoje">
-              <h4 class="chart-title">DEFEITOS</h4>
+              <div class="defects-header">
+                <h4 class="chart-title">DEFEITOS</h4>
+                <button class="page-nav-btn" id="pageNavBtn" title="Navegar página" onclick="togglePage()">
+                  <svg id="pageNavIcon" class="page-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
+              </div>
               <div class="grafico-grid"></div>
             </div>
             <div class="top3-area">
@@ -184,9 +191,6 @@
     <script>
       let onTopPage = true;
       function updatePageNavIcon(isTop) {
-        document.querySelectorAll('.page-nav-icon').forEach(icon => {
-          icon.classList.toggle('up', !isTop);
-        });
       }
       function togglePage() {
         const container = document.querySelector('.snap-container');

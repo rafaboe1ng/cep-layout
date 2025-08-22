@@ -296,12 +296,6 @@ body {
   max-width: 100%;
 }
 
-.page-nav-container {
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 10px;
-}
 
 .page-nav-btn {
   width: 36px;
