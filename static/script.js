@@ -7,13 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  document.querySelectorAll('.accordion-header').forEach(header => {
-    header.addEventListener('click', () => {
-      const content = header.nextElementSibling;
-      content.classList.toggle('open');
-    });
-  });
-
   // Mostrar custom-date-range só se for Personalizado
   const dateSelect = document.getElementById('dateFilter');
   const customRange = document.getElementById('customDateRange');
