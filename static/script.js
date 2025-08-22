@@ -1,49 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
   const sidebar = document.getElementById('sidebar');
   const hamburgerSidebarBtn = document.getElementById('hamburgerSidebarBtn');
-  const sidebarNavBtn = document.getElementById('sidebarNavBtn');
-  const sidebarNavIcon = document.getElementById('sidebarNavIcon');
-
-  function positionNavBtn() {
-    if (sidebarNavBtn && sidebar) {
-      if (sidebar.classList.contains('minimized')) {
-        sidebarNavBtn.style.left = '12px';
-      } else {
-        sidebarNavBtn.style.left = sidebar.offsetWidth + 'px';
-      }
-    }
-  }
-  positionNavBtn();
-  window.addEventListener('resize', positionNavBtn);
-
   if (hamburgerSidebarBtn) {
     hamburgerSidebarBtn.addEventListener('click', function () {
       sidebar.classList.toggle('minimized');
-      positionNavBtn();
     });
   }
-
-  let onTopPage = true;
-  function updateSidebarNavIcon(isTop) {
-    if (sidebarNavIcon) {
-      sidebarNavIcon.classList.toggle('up', !isTop);
-    }
-  }
-  function togglePage() {
-    const container = document.querySelector('.snap-container');
-    if (onTopPage) {
-      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
-      updateSidebarNavIcon(false);
-    } else {
-      container.scrollTo({ top: 0, behavior: 'smooth' });
-      updateSidebarNavIcon(true);
-    }
-    onTopPage = !onTopPage;
-  }
-  if (sidebarNavBtn) {
-    sidebarNavBtn.addEventListener('click', togglePage);
-  }
-  updateSidebarNavIcon(true);
 
   // Mostrar custom-date-range só se for Personalizado
   const dateSelect = document.getElementById('dateFilter');
@@ -118,16 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (value && !selectedDefects.has(value)) {
         const box = document.createElement('div');
         box.className = 'chart-item chart-small selected-defect';
-        const closeBtn = document.createElement('button');
-        closeBtn.className = 'selected-defect-close';
-        closeBtn.textContent = '×';
-        closeBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          selectedContainer.removeChild(box);
-          selectedDefects.delete(value);
-          updateLayout();
-        });
-        box.appendChild(closeBtn);
         const title = document.createElement('h4');
         title.className = 'chart-title';
         title.textContent = value;
@@ -135,6 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const grid = document.createElement('div');
         grid.className = 'grafico-grid';
         box.appendChild(grid);
+
+        box.addEventListener('click', () => {
+          selectedContainer.removeChild(box);
+          selectedDefects.delete(value);
+          updateLayout();
+        });
 
         selectedContainer.appendChild(box);
         selectedDefects.set(value, box);
