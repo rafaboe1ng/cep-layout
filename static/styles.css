@@ -67,15 +67,27 @@ body {
   overflow: hidden;
 }
 
-.logo-siri {
+.logo-siri-container {
   position: absolute;
   top: 50%;
   left: 32px;
   transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 10;
+}
+
+.logo-siri {
   height: 56px;
   width: auto;
   pointer-events: none;
-  z-index: 10;
+}
+
+.logo-siri-text {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
 }
 
 .header {
@@ -107,12 +119,6 @@ body {
   top: 50%;
   transform: translateY(-50%);
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.update-controls-row {
-  display: flex;
   align-items: center;
   gap: 18px;
 }
@@ -127,7 +133,6 @@ body {
 }
 
 .last-update-label {
-  margin-top: 4px;
   color: #bdc3c7;
   font-size: 1rem;
 }
@@ -317,6 +322,7 @@ body {
   display: flex;
   flex-direction: column;
   background: var(--body-bg, #2c3e50);
+  overflow: hidden;
 }
 
 .charts-grid-responsive {
