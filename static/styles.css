@@ -11,7 +11,7 @@
   transition: border-color 0.3s;
   display: flex;
 }
-/* Caixa quadrada para destacar áreas de gráficos */
+
 .grafico-box {
   background: #223044;
   border: 3px solid #1a2533;
@@ -174,7 +174,8 @@ body {
 
 .sidebar-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: flex-start;
   gap: 12px;
   margin: 0;
   position: relative;
@@ -294,7 +295,7 @@ body {
   scroll-snap-type: y mandatory;
   max-width: 100%;
 }
-/* Botão de navegação entre páginas - seta minimalista */
+
 .sidebar-nav-btn {
   width: 36px;
   height: 36px;
@@ -310,7 +311,7 @@ body {
 .sidebar-nav-icon {
   width: 24px;
   height: 24px;
-  color: var(--yellow);
+  color: #3498db;
   transition: transform 0.2s;
 }
 
