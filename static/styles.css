@@ -296,7 +296,19 @@ body {
   max-width: 100%;
 }
 
-.sidebar-nav-btn {
+.defects-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.defects-header .chart-title {
+  margin: 0;
+  text-align: left;
+}
+
+.page-nav-btn {
   width: 36px;
   height: 36px;
   border: none;
@@ -308,14 +320,14 @@ body {
   margin: 0;
 }
 
-.sidebar-nav-icon {
+.page-nav-icon {
   width: 24px;
   height: 24px;
   color: #3498db;
   transition: transform 0.2s;
 }
 
-.sidebar-nav-icon.up {
+.page-nav-icon.up {
   transform: rotate(180deg);
 }
 
