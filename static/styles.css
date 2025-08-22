@@ -59,7 +59,6 @@ html, body {
 
 body {
   margin: 0;
-  /* border: 3px solid var(--grafico-box-border); */
   background: var(--body-bg);
   height: 100vh;
   display: flex;
@@ -79,7 +78,7 @@ body {
 }
 
 .logo-siri {
-  height: 56px;
+  height: 72px;
   width: auto;
   pointer-events: none;
 }
