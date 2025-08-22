@@ -80,19 +80,26 @@ document.addEventListener('DOMContentLoaded', () => {
       if (value && !selectedDefects.has(value)) {
         const box = document.createElement('div');
         box.className = 'chart-item chart-small selected-defect';
+
         const title = document.createElement('h4');
         title.className = 'chart-title';
         title.textContent = value;
         box.appendChild(title);
+
         const grid = document.createElement('div');
         grid.className = 'grafico-grid';
         box.appendChild(grid);
 
-        box.addEventListener('click', () => {
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'close-btn';
+        closeBtn.textContent = '✕';
+        closeBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
           selectedContainer.removeChild(box);
           selectedDefects.delete(value);
           updateLayout();
         });
+        box.appendChild(closeBtn);
 
         selectedContainer.appendChild(box);
         selectedDefects.set(value, box);

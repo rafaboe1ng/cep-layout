@@ -416,6 +416,21 @@ body {
 }
 
 .selected-defect {
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: rgba(0, 0, 0, 0.5);
+  color: var(--yellow);
+  font-size: 14px;
+  line-height: 20px;
+  border-radius: 50%;
   cursor: pointer;
 }
 
