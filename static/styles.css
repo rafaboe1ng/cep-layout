@@ -133,7 +133,6 @@ body {
 }
 
 .main-content {
-  position: relative;
   flex: 1;
   display: flex;
   overflow: hidden;
@@ -289,9 +288,6 @@ body {
 }
 /* Botão de navegação entre páginas - seta minimalista */
 .sidebar-nav-btn {
-  position: absolute;
-  top: 12px;
-  left: 320px;
   width: 36px;
   height: 36px;
   border: none;
@@ -300,7 +296,7 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: left 0.3s;
+  margin-left: auto;
 }
 
 .sidebar-nav-icon {
@@ -420,20 +416,6 @@ body {
 }
 
 .selected-defect {
-  position: relative;
-}
-
-.selected-defect-close {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 16px;
-  height: 16px;
-  border: none;
-  background: transparent;
-  color: var(--yellow);
-  font-size: 14px;
-  line-height: 1;
   cursor: pointer;
 }
 
