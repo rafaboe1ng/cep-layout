@@ -163,7 +163,6 @@ body {
 /* Esconde todos os textos e controles da sidebar quando minimizada */
 
 .sidebar.minimized .sidebar-title,
-.sidebar.minimized .sidebar-nav-btn,
 .sidebar.minimized .accordion-header,
 .sidebar.minimized .accordion-content,
 .sidebar.minimized .checkbox-label,
@@ -175,11 +174,16 @@ body {
 
 .sidebar-header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: flex-start;
   gap: 12px;
   margin: 0;
   position: relative;
+}
+
+.sidebar-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .sidebar-hamburger-btn {
@@ -300,7 +304,7 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  margin-left: auto;
+  margin: 0;
 }
 
 .sidebar-nav-icon {
