@@ -296,7 +296,14 @@ body {
   max-width: 100%;
 }
 
-.sidebar-nav-btn {
+.page-nav-container {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+}
+
+.page-nav-btn {
   width: 36px;
   height: 36px;
   border: none;
@@ -308,14 +315,14 @@ body {
   margin: 0;
 }
 
-.sidebar-nav-icon {
+.page-nav-icon {
   width: 24px;
   height: 24px;
   color: #3498db;
   transition: transform 0.2s;
 }
 
-.sidebar-nav-icon.up {
+.page-nav-icon.up {
   transform: rotate(180deg);
 }
 
