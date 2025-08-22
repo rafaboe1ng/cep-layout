@@ -10,5 +10,10 @@ def dashboard():
         return redirect(url_for('dashboard'))
     return render_template('dashboard_cep.html')
 
+
+@app.route('/about')
+def about():
+    return 'About'
+
 if __name__ == '__main__':
     app.run(debug=True)
