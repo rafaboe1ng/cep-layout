@@ -30,34 +30,6 @@
           <span class="hamburger-bar"></span>
         </button>
         <h3 class="sidebar-title">Filtros</h3>
-        <button class="sidebar-nav-btn" id="sidebarNavBtn" title="Navegar página" onclick="togglePage()">
-          <svg id="sidebarNavIcon" class="sidebar-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </button>
-        <script>
-    // Alterna seta do botão de navegação conforme página e faz scroll
-      let onTopPage = true;
-      function updateSidebarNavIcon(isTop) {
-        const icon = document.getElementById('sidebarNavIcon');
-        if (icon) {
-          icon.classList.toggle('up', !isTop);
-        }
-      }
-    function togglePage() {
-      const container = document.querySelector('.snap-container');
-      if (onTopPage) {
-        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
-        updateSidebarNavIcon(false);
-      } else {
-        container.scrollTo({ top: 0, behavior: 'smooth' });
-        updateSidebarNavIcon(true);
-      }
-      onTopPage = !onTopPage;
-    }
-    // Inicializa seta para baixo
-    updateSidebarNavIcon(true);
-  </script>
       </header>
         <div class="accordion" id="filterAccordion">
           <div class="accordion-item">
@@ -147,6 +119,11 @@
           </div>
         </div>
     </aside>
+    <button class="sidebar-nav-btn" id="sidebarNavBtn" title="Navegar página">
+      <svg id="sidebarNavIcon" class="sidebar-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
     <div class="snap-container">
       <!-- Página 1: Dashboard -->
       <section class="snap-page">
