@@ -302,6 +302,7 @@ body {
   justify-content: center;
   position: relative;
   margin-bottom: 10px;
+  min-height: 36px;
 }
 
 .defects-header .chart-title {
@@ -365,6 +366,10 @@ body {
   align-items: stretch;
   justify-items: stretch;
   box-sizing: border-box;
+}
+
+.charts-grid-custom.single-row {
+  grid-template-rows: 1fr;
 }
 
 .chart-item {
