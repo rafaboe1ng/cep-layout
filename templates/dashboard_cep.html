@@ -24,17 +24,19 @@
   <div class="main-content">
     <aside class="sidebar minimized" id="sidebar">
       <header class="sidebar-header">
-        <button id="hamburgerSidebarBtn" class="sidebar-hamburger-btn" title="Abrir/Fechar Sidebar" aria-label="Abrir/Fechar Sidebar">
-          <span class="hamburger-bar"></span>
-          <span class="hamburger-bar"></span>
-          <span class="hamburger-bar"></span>
-        </button>
+        <div class="sidebar-buttons">
+          <button id="hamburgerSidebarBtn" class="sidebar-hamburger-btn" title="Abrir/Fechar Sidebar" aria-label="Abrir/Fechar Sidebar">
+            <span class="hamburger-bar"></span>
+            <span class="hamburger-bar"></span>
+            <span class="hamburger-bar"></span>
+          </button>
+          <button class="sidebar-nav-btn" id="sidebarNavBtn" title="Navegar página" onclick="togglePage()">
+            <svg id="sidebarNavIcon" class="sidebar-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
         <h3 class="sidebar-title">Filtros</h3>
-        <button class="sidebar-nav-btn" id="sidebarNavBtn" title="Navegar página" onclick="togglePage()">
-          <svg id="sidebarNavIcon" class="sidebar-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </button>
         <script>
     // Alterna seta do botão de navegação conforme página e faz scroll
       let onTopPage = true;
