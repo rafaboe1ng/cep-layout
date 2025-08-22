@@ -125,6 +125,13 @@
       <!-- Página 1: Dashboard -->
       <section class="snap-page">
         <section class="charts-area no-scroll">
+          <div class="page-nav-container">
+            <button class="page-nav-btn" title="Navegar página" onclick="togglePage()">
+              <svg class="page-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
           <div class="charts-grid-custom">
             <div class="chart-item chart-hoje">
               <div class="defects-header">
@@ -160,6 +167,13 @@
       <!-- Página 2: Conteúdo extra -->
       <section class="snap-page">
         <section class="charts-area no-scroll">
+          <div class="page-nav-container">
+            <button class="page-nav-btn" title="Navegar página" onclick="togglePage()">
+              <svg class="page-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
           <div class="charts-grid-custom">
             <div id="selectedDefectsContainer" class="selected-defects-grid"></div>
           </div>
@@ -177,10 +191,6 @@
     <script>
       let onTopPage = true;
       function updatePageNavIcon(isTop) {
-        const icon = document.getElementById('pageNavIcon');
-        if (icon) {
-          icon.classList.toggle('up', !isTop);
-        }
       }
       function togglePage() {
         const container = document.querySelector('.snap-container');

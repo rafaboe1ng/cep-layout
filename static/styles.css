@@ -296,17 +296,6 @@ body {
   max-width: 100%;
 }
 
-.defects-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.defects-header .chart-title {
-  margin: 0;
-  text-align: left;
-}
 
 .page-nav-btn {
   width: 36px;
