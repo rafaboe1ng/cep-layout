@@ -348,10 +348,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (defectQuantityOk) {
     defectQuantityOk.addEventListener('click', () => {
-      if (selectedDefects.size === 0) {
-        showingTop = true;
-        loadTopDefects();
+      if (selectedDefects.size > 0) {
+        selectedDefects.forEach(({ box, item }) => {
+          if (box.parentNode) selectedContainer.removeChild(box);
+          if (item.parentNode) sidebarList.removeChild(item);
+        });
+        selectedDefects.clear();
+        updateLayout();
+        if (clearAllBtn) clearAllBtn.style.display = 'none';
       }
+      selectedContainer.innerHTML = '';
+      showingTop = true;
+      refreshAll();
     });
   }
 
