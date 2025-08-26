@@ -25,7 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Atualiza gráficos conforme defeitos selecionados
   const defectSelect = document.getElementById('defectFilter');
   const selectedContainer = document.getElementById('selectedDefectsContainer');
-  if (defectSelect && selectedContainer) {
+  const sidebarList = document.getElementById('selectedDefectsSidebar');
+  const clearAllBtn = document.getElementById('clearDefectsBtn');
+  if (defectSelect && selectedContainer && sidebarList && clearAllBtn) {
     const selectedDefects = new Map();
 
     function updateLayout() {
@@ -75,6 +77,20 @@ document.addEventListener('DOMContentLoaded', () => {
       placeRow(top, bottom, 2);
     }
 
+    function updateSidebarVisibility() {
+      clearAllBtn.style.display = selectedDefects.size > 0 ? '' : 'none';
+    }
+
+    clearAllBtn.addEventListener('click', () => {
+      selectedDefects.forEach(({ box, item }) => {
+        if (box.parentNode) selectedContainer.removeChild(box);
+        if (item.parentNode) sidebarList.removeChild(item);
+      });
+      selectedDefects.clear();
+      updateLayout();
+      updateSidebarVisibility();
+    });
+
     defectSelect.addEventListener('change', () => {
       const value = defectSelect.value;
       if (value && !selectedDefects.has(value)) {
@@ -93,17 +109,36 @@ document.addEventListener('DOMContentLoaded', () => {
         const closeBtn = document.createElement('button');
         closeBtn.className = 'close-btn';
         closeBtn.textContent = '✕';
-        closeBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
+
+        const item = document.createElement('div');
+        item.className = 'sidebar-selected-defect';
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = value;
+        item.appendChild(nameSpan);
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-defect-btn';
+        removeBtn.textContent = '✕';
+        item.appendChild(removeBtn);
+
+        const remove = (e) => {
+          if (e) e.stopPropagation();
           selectedContainer.removeChild(box);
+          sidebarList.removeChild(item);
           selectedDefects.delete(value);
           updateLayout();
-        });
+          updateSidebarVisibility();
+        };
+
+        closeBtn.addEventListener('click', remove);
+        removeBtn.addEventListener('click', remove);
+
         box.appendChild(closeBtn);
 
         selectedContainer.appendChild(box);
-        selectedDefects.set(value, box);
+        sidebarList.appendChild(item);
+        selectedDefects.set(value, { box, item });
         updateLayout();
+        updateSidebarVisibility();
       }
 
       defectSelect.value = '';
