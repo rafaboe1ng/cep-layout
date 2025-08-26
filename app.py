@@ -94,7 +94,7 @@ def get_top_defects():
         SELECT e.cod AS id, e.name AS name, COUNT(*) AS total
         FROM sample_inspection si
         JOIN sample_inspection_error sie ON si.id = sie.sample_inspection_id
-        JOIN error e ON sie.error_id = e.cod
+        JOIN error e ON sie.error_id = e.id
         WHERE si.audit = 0 AND DATE(si.ts) BETWEEN :start AND :end
         """
     )
