@@ -184,19 +184,76 @@ document.addEventListener('DOMContentLoaded', () => {
     return params;
   }
 
+  function renderUChart(container, errorId) {
+    if (!container) return Promise.resolve();
+    const params = buildParams(errorId ? { error: errorId } : {});
+    return fetch(`/get_u_chart?${params.toString()}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data.success) return;
+        const labels = data.data.map((d) => d.date);
+        const uData = data.data.map((d) => d.u);
+        const uclData = data.data.map((d) => d.ucl);
+        const lclData = data.data.map((d) => d.lcl);
+        if (container._chart) {
+          container._chart.destroy();
+        }
+        container.innerHTML = '';
+        const canvas = document.createElement('canvas');
+        container.appendChild(canvas);
+        container._chart = new Chart(canvas.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [
+              { label: 'u', data: uData, borderColor: 'blue', fill: false },
+              {
+                label: 'UCL',
+                data: uclData,
+                borderColor: 'red',
+                borderDash: [5, 5],
+                fill: false,
+              },
+              {
+                label: 'LCL',
+                data: lclData,
+                borderColor: 'green',
+                borderDash: [5, 5],
+                fill: false,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+          },
+        });
+      });
+  }
+
   function loadTop3() {
     const params = buildParams({ order: 'desc', limit: 3 });
     return fetch(`/get_top_defects?${params.toString()}`)
       .then((r) => r.json())
       .then((data) => {
         if (data.success) {
+          const grids = document.querySelectorAll('.top3-row .grafico-grid');
           for (let i = 0; i < 3; i++) {
             const title = topDefectTitles[i];
-            if (!title) continue;
+            const grid = grids[i];
             const defect = data.defects[i];
-            title.textContent = defect
-              ? `${defect.id} - ${defect.name} (${defect.total})`
-              : '- (0)';
+            if (title) {
+              title.textContent = defect
+                ? `${defect.id} - ${defect.name} (${defect.total})`
+                : '- (0)';
+            }
+            if (grid) {
+              if (grid._chart) {
+                grid._chart.destroy();
+              }
+              grid.innerHTML = '';
+              grid.dataset.errorId = defect ? defect.id : '';
+            }
           }
         }
       });
@@ -210,6 +267,9 @@ document.addEventListener('DOMContentLoaded', () => {
       .then((r) => r.json())
       .then((data) => {
         if (data.success) {
+          selectedContainer.querySelectorAll('.grafico-grid').forEach((g) => {
+            if (g._chart) g._chart.destroy();
+          });
           selectedContainer.innerHTML = '';
           if (data.defects.length === 0) {
             const box = document.createElement('div');
@@ -220,6 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
             box.appendChild(title);
             const grid = document.createElement('div');
             grid.className = 'grafico-grid';
+            grid.dataset.errorId = '';
             box.appendChild(grid);
             selectedContainer.appendChild(box);
           } else {
@@ -234,6 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
               const grid = document.createElement('div');
               grid.className = 'grafico-grid';
+              grid.dataset.errorId = def.id;
               box.appendChild(grid);
 
               selectedContainer.appendChild(box);
@@ -284,9 +346,25 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (showingTop) {
       tasks.push(loadTopDefects());
     } else {
+      selectedContainer.querySelectorAll('.grafico-grid').forEach((g) => {
+        if (g._chart) g._chart.destroy();
+      });
       selectedContainer.innerHTML = '';
     }
-    return Promise.all(tasks);
+    return Promise.all(tasks).then(() => {
+      const chartTasks = [];
+      const mainGrid = document.querySelector('.chart-item.chart-hoje .grafico-grid');
+      if (mainGrid) chartTasks.push(renderUChart(mainGrid));
+      document.querySelectorAll('.top3-row .grafico-grid').forEach((grid) => {
+        const id = grid.dataset.errorId;
+        if (id) chartTasks.push(renderUChart(grid, id));
+      });
+      selectedContainer.querySelectorAll('.grafico-grid').forEach((grid) => {
+        const id = grid.dataset.errorId;
+        if (id) chartTasks.push(renderUChart(grid, id));
+      });
+      return Promise.all(chartTasks);
+    });
   }
 
   function updateLastUpdate() {
@@ -324,30 +402,35 @@ document.addEventListener('DOMContentLoaded', () => {
       clearAllBtn.style.display = selectedDefects.size > 0 ? '' : 'none';
     }
 
-    clearAllBtn.addEventListener('click', () => {
-      selectedDefects.forEach(({ box, item }) => {
-        if (box.parentNode) selectedContainer.removeChild(box);
-        if (item.parentNode) sidebarList.removeChild(item);
+      clearAllBtn.addEventListener('click', () => {
+        selectedDefects.forEach(({ box, item }) => {
+          const gridEl = box.querySelector('.grafico-grid');
+          if (gridEl && gridEl._chart) gridEl._chart.destroy();
+          if (box.parentNode) selectedContainer.removeChild(box);
+          if (item.parentNode) sidebarList.removeChild(item);
+        });
+        selectedDefects.clear();
+        showingTop = false;
+        selectedContainer.innerHTML = '';
+        updateLayout();
+        updateSidebarVisibility();
+        refreshAndUpdate();
       });
-      selectedDefects.clear();
-      showingTop = false;
-      selectedContainer.innerHTML = '';
-      updateLayout();
-      updateSidebarVisibility();
-      refreshAndUpdate();
-    });
 
     defectSelect.addEventListener('change', () => {
       const value = defectSelect.value;
       if (value) {
         const [id, name] = value.split(' - ');
-        if (!selectedDefects.has(id)) {
-          if (showingTop) {
-            selectedContainer.innerHTML = '';
-            showingTop = false;
-          }
-          const box = document.createElement('div');
-          box.className = 'chart-item chart-small selected-defect';
+          if (!selectedDefects.has(id)) {
+            if (showingTop) {
+              selectedContainer.querySelectorAll('.grafico-grid').forEach((g) => {
+                if (g._chart) g._chart.destroy();
+              });
+              selectedContainer.innerHTML = '';
+              showingTop = false;
+            }
+            const box = document.createElement('div');
+            box.className = 'chart-item chart-small selected-defect';
 
           const title = document.createElement('h4');
           title.className = 'chart-title';
@@ -356,6 +439,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           const grid = document.createElement('div');
           grid.className = 'grafico-grid';
+          grid.dataset.errorId = id;
           box.appendChild(grid);
 
           const closeBtn = document.createElement('button');
@@ -374,6 +458,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
           const remove = (e) => {
             if (e) e.stopPropagation();
+            const gridEl = box.querySelector('.grafico-grid');
+            if (gridEl && gridEl._chart) gridEl._chart.destroy();
             selectedContainer.removeChild(box);
             sidebarList.removeChild(item);
             selectedDefects.delete(id);
