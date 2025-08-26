@@ -88,34 +88,55 @@ def get_top_defects():
     ids = request.args.getlist('id')
     if not start or not end:
         return jsonify({'success': False, 'message': 'Missing date range'}), 400
-
-    base_query = (
-        """
-        SELECT e.cod AS id, e.name AS name, COUNT(*) AS total
-        FROM sample_inspection si
-        JOIN sample_inspection_error sie ON si.id = sie.sample_inspection_id
-        JOIN error e ON sie.error_id = e.id
-        WHERE si.audit = 0 AND DATE(si.ts) BETWEEN :start AND :end
-        """
-    )
     params = {'start': start, 'end': end}
-    if cells:
-        placeholders = ",".join(f":cell{i}" for i in range(len(cells)))
-        base_query += f" AND si.cell_id IN ({placeholders})"
-        for i, cell in enumerate(cells):
-            params[f"cell{i}"] = cell
+
     if ids:
-        placeholders = ",".join(f":id{i}" for i in range(len(ids)))
-        base_query += f" AND e.cod IN ({placeholders})"
+        id_placeholders = ",".join(f":id{i}" for i in range(len(ids)))
         for i, id_ in enumerate(ids):
             params[f"id{i}"] = id_
-    base_query += " GROUP BY e.cod, e.name"
-    if ids:
-        order_placeholders = ",".join(f":id{i}" for i in range(len(ids)))
-        base_query += f" ORDER BY FIELD(e.cod, {order_placeholders})"
+        inner_query = (
+            """
+            SELECT e.cod AS cod, COUNT(*) AS total
+            FROM sample_inspection si
+            JOIN sample_inspection_error sie ON si.id = sie.sample_inspection_id
+            JOIN error e ON sie.error_id = e.id
+            WHERE si.audit = 0 AND DATE(si.ts) BETWEEN :start AND :end
+            """
+        )
+        if cells:
+            cell_placeholders = ",".join(f":cell{i}" for i in range(len(cells)))
+            inner_query += f" AND si.cell_id IN ({cell_placeholders})"
+            for i, cell in enumerate(cells):
+                params[f"cell{i}"] = cell
+        inner_query += " GROUP BY e.cod"
+        base_query = (
+            f"""
+            SELECT e.cod AS id, e.name AS name, COALESCE(t.total, 0) AS total
+            FROM error e
+            LEFT JOIN ({inner_query}) t ON t.cod = e.cod
+            WHERE e.cod IN ({id_placeholders})
+            ORDER BY FIELD(e.cod, {id_placeholders})
+            """
+        )
     else:
+        base_query = (
+            """
+            SELECT e.cod AS id, e.name AS name, COUNT(*) AS total
+            FROM sample_inspection si
+            JOIN sample_inspection_error sie ON si.id = sie.sample_inspection_id
+            JOIN error e ON sie.error_id = e.id
+            WHERE si.audit = 0 AND DATE(si.ts) BETWEEN :start AND :end
+            """
+        )
+        if cells:
+            cell_placeholders = ",".join(f":cell{i}" for i in range(len(cells)))
+            base_query += f" AND si.cell_id IN ({cell_placeholders})"
+            for i, cell in enumerate(cells):
+                params[f"cell{i}"] = cell
+        base_query += " GROUP BY e.cod, e.name"
         base_query += f" ORDER BY total {'ASC' if order == 'asc' else 'DESC'} LIMIT :limit"
         params['limit'] = limit
+
     try:
         with engine.connect() as conn:
             result = conn.execute(text(base_query), params).mappings().all()
