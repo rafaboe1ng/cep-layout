@@ -31,10 +31,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let end;
     switch (dateSelect.value) {
       case 'today':
-        start = end = today;
+        // Include the four previous days so the chart has context
+        end = today;
+        start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 4);
         break;
       case 'yesterday':
-        start = end = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
+        // Show five consecutive days ending yesterday
+        end = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
+        start = new Date(end.getFullYear(), end.getMonth(), end.getDate() - 4);
         break;
       case 'last3':
         start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 2);

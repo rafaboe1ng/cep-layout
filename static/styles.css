@@ -42,7 +42,7 @@
   --blue-dark: #023275;
   --blue-hover: #04234d;
   --panel-bg: #0048aa;
-  --body-bg: #022961;
+  --body-bg: #f0f0f0;
   --text-light: #ecf0f1;
   --grafico-box-border: #8fd6ff;
 }
@@ -377,7 +377,7 @@ body {
 }
 
 .chart-item {
-  background: var(--panel-bg);
+  background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   padding: 18px 18px 10px;
@@ -389,7 +389,7 @@ body {
 .chart-hoje {
   grid-column: 1 / 2;
   grid-row: 1 / 2;
-  background: var(--panel-bg);
+  background: #ffffff;
   border-radius: 0;
   box-shadow: none;
   padding: 0;
@@ -411,7 +411,7 @@ body {
   flex-direction: column;
   align-items: stretch;
   justify-content: stretch;
-  background: var(--panel-bg);
+  background: #ffffff;
   border-radius: 0;
   box-shadow: none;
   padding: 0;
