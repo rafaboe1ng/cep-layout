@@ -117,6 +117,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const selectedContainer = document.getElementById('selectedDefectsContainer');
   const sidebarList = document.getElementById('selectedDefectsSidebar');
   const clearAllBtn = document.getElementById('clearDefectsBtn');
+
+  if (defectSelect) {
+    fetch('/get_errors')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) {
+          data.errors.forEach((err) => {
+            const option = document.createElement('option');
+            const text = `${err.id} - ${err.name}`;
+            option.value = text;
+            option.textContent = text;
+            defectSelect.appendChild(option);
+          });
+        }
+      });
+  }
+
   if (defectSelect && selectedContainer && sidebarList && clearAllBtn) {
     const selectedDefects = new Map();
 

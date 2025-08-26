@@ -60,5 +60,22 @@ def get_counts():
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
+
+@app.route('/get_errors', methods=['GET'])
+def get_errors():
+    try:
+        query = """
+            SELECT cod, name
+            FROM error
+            WHERE delete_user_id IS NULL
+            ORDER BY cod
+        """
+        with engine.connect() as conn:
+            result = conn.execute(text(query)).mappings().all()
+        errors = [{'id': row['cod'], 'name': row['name']} for row in result]
+        return jsonify({'success': True, 'errors': errors})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)
