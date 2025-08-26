@@ -106,17 +106,143 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleCustomRange();
     dateSelect.addEventListener('change', () => {
       toggleCustomRange();
-      fetchTotals();
+      refreshAll();
     });
   }
-  if (startDateInput) startDateInput.addEventListener('change', fetchTotals);
-  if (endDateInput) endDateInput.addEventListener('change', fetchTotals);
+  if (startDateInput) startDateInput.addEventListener('change', refreshAll);
+  if (endDateInput) endDateInput.addEventListener('change', refreshAll);
 
   // Atualiza gráficos conforme defeitos selecionados
   const defectSelect = document.getElementById('defectFilter');
   const selectedContainer = document.getElementById('selectedDefectsContainer');
   const sidebarList = document.getElementById('selectedDefectsSidebar');
   const clearAllBtn = document.getElementById('clearDefectsBtn');
+  const selectedDefects = new Map();
+  const defectOrderSwitch = document.getElementById('defectOrderSwitch');
+  const defectQuantityInput = document.getElementById('defectQuantity');
+  const defectQuantityOk = document.getElementById('defectQuantityOk');
+  const topDefectTitles = [
+    document.getElementById('topDefect1'),
+    document.getElementById('topDefect2'),
+    document.getElementById('topDefect3'),
+  ];
+  let showingTop = false;
+
+  function updateLayout() {
+    const items = Array.from(selectedContainer.querySelectorAll('.chart-item'));
+    const count = items.length;
+
+    if (count === 0) {
+      selectedContainer.style.gridTemplateColumns = '';
+      selectedContainer.style.gridTemplateRows = '';
+      return;
+    }
+
+    let top, bottom;
+    if (count % 2 === 0) {
+      top = bottom = count / 2;
+    } else if (count >= 3) {
+      top = Math.floor(count / 2);
+      bottom = count - top;
+    } else {
+      top = count;
+      bottom = 0;
+    }
+
+    const cols = Math.max(top, bottom);
+    selectedContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    selectedContainer.style.gridTemplateRows = bottom > 0 ? '1fr 1fr' : '1fr';
+
+    const placeRow = (startIdx, n, row) => {
+      if (n === 0) return;
+      const baseSpan = Math.floor(cols / n) || 1;
+      let leftover = cols - baseSpan * n;
+      let colStart = 1;
+      for (let i = 0; i < n; i++) {
+        const item = items[startIdx + i];
+        let span = baseSpan;
+        if (leftover > 0) {
+          span += 1;
+          leftover -= 1;
+        }
+        item.style.gridRow = String(row);
+        item.style.gridColumn = `${colStart} / span ${span}`;
+        colStart += span;
+      }
+    };
+
+    placeRow(0, top, 1);
+    placeRow(top, bottom, 2);
+  }
+
+  function buildParams(extra = {}) {
+    const { start, end } = getDateRange();
+    const params = new URLSearchParams({ start, end, ...extra });
+    selectedCells.forEach((_, cell) => params.append('cell', cell));
+    return params;
+  }
+
+  function loadTop3() {
+    const params = buildParams({ order: 'desc', limit: 3 });
+    fetch(`/get_top_defects?${params.toString()}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) {
+          for (let i = 0; i < 3; i++) {
+            const title = topDefectTitles[i];
+            if (!title) continue;
+            const defect = data.defects[i];
+            title.textContent = defect ? `${defect.id} - ${defect.name}` : '';
+          }
+        }
+      });
+  }
+
+  function loadTopDefects() {
+    const order = defectOrderSwitch && defectOrderSwitch.checked ? 'asc' : 'desc';
+    const limit = defectQuantityInput ? parseInt(defectQuantityInput.value) || 6 : 6;
+    const params = buildParams({ order, limit });
+    fetch(`/get_top_defects?${params.toString()}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) {
+          selectedContainer.innerHTML = '';
+          data.defects.forEach((def) => {
+            const box = document.createElement('div');
+            box.className = 'chart-item chart-small';
+            const title = document.createElement('h4');
+            title.className = 'chart-title';
+            title.textContent = `${def.id} - ${def.name}`;
+            box.appendChild(title);
+            const grid = document.createElement('div');
+            grid.className = 'grafico-grid';
+            box.appendChild(grid);
+            selectedContainer.appendChild(box);
+          });
+          updateLayout();
+        }
+      });
+  }
+
+  function renderSelectedDefects() {
+    selectedContainer.innerHTML = '';
+    selectedDefects.forEach(({ box }) => {
+      selectedContainer.appendChild(box);
+    });
+    updateLayout();
+  }
+
+  function refreshAll() {
+    fetchTotals();
+    loadTop3();
+    if (selectedDefects.size > 0) {
+      renderSelectedDefects();
+    } else if (showingTop) {
+      loadTopDefects();
+    } else {
+      selectedContainer.innerHTML = '';
+    }
+  }
 
   if (defectSelect) {
     fetch('/get_errors')
@@ -135,54 +261,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (defectSelect && selectedContainer && sidebarList && clearAllBtn) {
-    const selectedDefects = new Map();
-
-    function updateLayout() {
-      const items = Array.from(selectedContainer.querySelectorAll('.selected-defect'));
-      const count = items.length;
-
-      if (count === 0) {
-        selectedContainer.style.gridTemplateColumns = '';
-        selectedContainer.style.gridTemplateRows = '';
-        return;
-      }
-
-      let top, bottom;
-      if (count % 2 === 0) {
-        top = bottom = count / 2;
-      } else if (count >= 3) {
-        top = Math.floor(count / 2);
-        bottom = count - top;
-      } else {
-        top = count;
-        bottom = 0;
-      }
-
-      const cols = Math.max(top, bottom);
-      selectedContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-      selectedContainer.style.gridTemplateRows = bottom > 0 ? '1fr 1fr' : '1fr';
-
-      const placeRow = (startIdx, n, row) => {
-        if (n === 0) return;
-        const baseSpan = Math.floor(cols / n) || 1;
-        let leftover = cols - baseSpan * n;
-        let colStart = 1;
-        for (let i = 0; i < n; i++) {
-          const item = items[startIdx + i];
-          let span = baseSpan;
-          if (leftover > 0) {
-            span += 1;
-            leftover -= 1;
-          }
-          item.style.gridRow = String(row);
-          item.style.gridColumn = `${colStart} / span ${span}`;
-          colStart += span;
-        }
-      };
-
-      placeRow(0, top, 1);
-      placeRow(top, bottom, 2);
-    }
 
     function updateSidebarVisibility() {
       clearAllBtn.style.display = selectedDefects.size > 0 ? '' : 'none';
@@ -194,13 +272,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (item.parentNode) sidebarList.removeChild(item);
       });
       selectedDefects.clear();
+      showingTop = false;
+      selectedContainer.innerHTML = '';
       updateLayout();
       updateSidebarVisibility();
+      refreshAll();
     });
 
     defectSelect.addEventListener('change', () => {
       const value = defectSelect.value;
       if (value && !selectedDefects.has(value)) {
+        if (showingTop) {
+          selectedContainer.innerHTML = '';
+          showingTop = false;
+        }
         const box = document.createElement('div');
         box.className = 'chart-item chart-small selected-defect';
 
@@ -232,6 +317,10 @@ document.addEventListener('DOMContentLoaded', () => {
           selectedContainer.removeChild(box);
           sidebarList.removeChild(item);
           selectedDefects.delete(value);
+          if (selectedDefects.size === 0) {
+            selectedContainer.innerHTML = '';
+            showingTop = false;
+          }
           updateLayout();
           updateSidebarVisibility();
         };
@@ -252,6 +341,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  if (defectQuantityOk) {
+    defectQuantityOk.addEventListener('click', () => {
+      if (selectedDefects.size === 0) {
+        showingTop = true;
+        loadTopDefects();
+      }
+    });
+  }
+
   const cellSelect = document.getElementById('cellFilter');
   const cellSidebar = document.getElementById('selectedCellsSidebar');
   const clearCellsBtn = document.getElementById('clearCellsBtn');
@@ -266,7 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       selectedCells.clear();
       updateCellSidebarVisibility();
-      fetchTotals();
+      refreshAll();
     });
 
     cellSelect.addEventListener('change', () => {
@@ -290,7 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
           cellSidebar.removeChild(item);
           selectedCells.delete(dbValue);
           updateCellSidebarVisibility();
-          fetchTotals();
+          refreshAll();
         };
 
         removeBtn.addEventListener('click', remove);
@@ -298,7 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cellSidebar.appendChild(item);
         selectedCells.set(dbValue, item);
         updateCellSidebarVisibility();
-        fetchTotals();
+        refreshAll();
       }
 
       cellSelect.value = '';
@@ -307,5 +405,5 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCellSidebarVisibility();
   }
 
-  fetchTotals();
+  refreshAll();
 });
