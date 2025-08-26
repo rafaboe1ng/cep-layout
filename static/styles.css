@@ -563,3 +563,82 @@ body {
     gap: 16px;
   }
 }
+
+/* Sidebar defect filter additions */
+.sidebar-section-title {
+  color: var(--yellow);
+  font-size: 1rem;
+  margin: 12px 0 8px;
+}
+
+.toggle-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.toggle-switch .order-label {
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+.switch {
+  position: relative;
+  width: 42px;
+  height: 22px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 22px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: 2px;
+  background-color: #fff;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+.switch input:checked + .slider {
+  background-color: var(--yellow);
+}
+
+.switch input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+.quantity-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.quantity-container label {
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+.quantity-input {
+  width: 80px;
+}

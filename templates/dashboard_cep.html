@@ -90,6 +90,20 @@
             </h2>
             <div id="collapseDefect" class="accordion-collapse collapse" aria-labelledby="headingDefect" data-bs-parent="#filterAccordion">
               <div class="accordion-body">
+                <h5 class="sidebar-section-title">Ordenar defeitos</h5>
+                <div class="toggle-switch">
+                  <span class="order-label">Decrescente</span>
+                  <label class="switch">
+                    <input type="checkbox" id="defectOrderSwitch">
+                    <span class="slider"></span>
+                  </label>
+                  <span class="order-label">Crescente</span>
+                </div>
+                <div class="quantity-container">
+                  <label for="defectQuantity">Quantidade:</label>
+                  <input type="number" id="defectQuantity" class="form-control quantity-input" min="1" value="1">
+                </div>
+                <h5 class="sidebar-section-title">Defeitos Específicos</h5>
                 <select id="defectFilter" class="form-select filter-select">
                   <option value="">Selecione um defeito</option>
                   <option value="0001 - Curto por Solda">0001 - Curto por Solda</option>
