@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const endDateInput = document.getElementById('endDate');
   const selectedCells = new Map();
 
+  const toDbCell = (name) => name.replace('-', '').replace('UPS0', 'UPS');
+
   function toggleCustomRange() {
     if (dateSelect.value === 'custom') {
       customRange.style.display = '';
@@ -252,7 +254,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     cellSelect.addEventListener('change', () => {
       const value = cellSelect.value;
-      if (value && !selectedCells.has(value)) {
+      const dbValue = toDbCell(value);
+      if (value && !selectedCells.has(dbValue)) {
         const item = document.createElement('div');
         item.className = 'sidebar-selected-defect';
 
@@ -268,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const remove = (e) => {
           if (e) e.stopPropagation();
           cellSidebar.removeChild(item);
-          selectedCells.delete(value);
+          selectedCells.delete(dbValue);
           updateCellSidebarVisibility();
           fetchTotals();
         };
@@ -276,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
         removeBtn.addEventListener('click', remove);
 
         cellSidebar.appendChild(item);
-        selectedCells.set(value, item);
+        selectedCells.set(dbValue, item);
         updateCellSidebarVisibility();
         fetchTotals();
       }
