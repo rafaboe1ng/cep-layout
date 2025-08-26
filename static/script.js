@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const defect = data.defects[i];
             title.textContent = defect
               ? `${defect.id} - ${defect.name} (${defect.total})`
-              : '-';
+              : '- (0)';
           }
         }
       });
@@ -209,21 +209,34 @@ document.addEventListener('DOMContentLoaded', () => {
       .then((data) => {
         if (data.success) {
           selectedContainer.innerHTML = '';
-          data.defects.forEach((def) => {
+          if (data.defects.length === 0) {
             const box = document.createElement('div');
             box.className = 'chart-item chart-small';
-
             const title = document.createElement('h4');
             title.className = 'chart-title';
-            title.textContent = `${def.id} - ${def.name} (${def.total})`;
+            title.textContent = 'Nenhum defeito (0)';
             box.appendChild(title);
-
             const grid = document.createElement('div');
             grid.className = 'grafico-grid';
             box.appendChild(grid);
-
             selectedContainer.appendChild(box);
-          });
+          } else {
+            data.defects.forEach((def) => {
+              const box = document.createElement('div');
+              box.className = 'chart-item chart-small';
+
+              const title = document.createElement('h4');
+              title.className = 'chart-title';
+              title.textContent = `${def.id} - ${def.name} (${def.total})`;
+              box.appendChild(title);
+
+              const grid = document.createElement('div');
+              grid.className = 'grafico-grid';
+              box.appendChild(grid);
+
+              selectedContainer.appendChild(box);
+            });
+          }
           updateLayout();
         }
       });
@@ -237,11 +250,36 @@ document.addEventListener('DOMContentLoaded', () => {
     updateLayout();
   }
 
+  function updateSelectedDefectCounts() {
+    if (selectedDefects.size === 0) return;
+    const params = buildParams();
+    selectedDefects.forEach((_, id) => params.append('id', id));
+    fetch(`/get_top_defects?${params.toString()}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) {
+          const totals = new Map();
+          data.defects.forEach((def) => {
+            totals.set(String(def.id), def.total);
+          });
+          selectedDefects.forEach(({ box, item, name }, id) => {
+            const count = totals.get(String(id)) || 0;
+            const text = `${id} - ${name} (${count})`;
+            const titleEl = box.querySelector('.chart-title');
+            if (titleEl) titleEl.textContent = text;
+            const spanEl = item.querySelector('span');
+            if (spanEl) spanEl.textContent = text;
+          });
+        }
+      });
+  }
+
   function refreshAll() {
     fetchTotals();
     loadTop3();
     if (selectedDefects.size > 0) {
       renderSelectedDefects();
+      updateSelectedDefectCounts();
     } else if (showingTop) {
       loadTopDefects();
     } else {
@@ -286,60 +324,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
     defectSelect.addEventListener('change', () => {
       const value = defectSelect.value;
-      if (value && !selectedDefects.has(value)) {
-        if (showingTop) {
-          selectedContainer.innerHTML = '';
-          showingTop = false;
-        }
-        const box = document.createElement('div');
-        box.className = 'chart-item chart-small selected-defect';
-
-        const title = document.createElement('h4');
-        title.className = 'chart-title';
-        title.textContent = value;
-        box.appendChild(title);
-
-        const grid = document.createElement('div');
-        grid.className = 'grafico-grid';
-        box.appendChild(grid);
-
-        const closeBtn = document.createElement('button');
-        closeBtn.className = 'close-btn';
-        closeBtn.textContent = '✕';
-
-        const item = document.createElement('div');
-        item.className = 'sidebar-selected-defect';
-        const nameSpan = document.createElement('span');
-        nameSpan.textContent = value;
-        item.appendChild(nameSpan);
-        const removeBtn = document.createElement('button');
-        removeBtn.className = 'remove-defect-btn';
-        removeBtn.textContent = '✕';
-        item.appendChild(removeBtn);
-
-        const remove = (e) => {
-          if (e) e.stopPropagation();
-          selectedContainer.removeChild(box);
-          sidebarList.removeChild(item);
-          selectedDefects.delete(value);
-          if (selectedDefects.size === 0) {
+      if (value) {
+        const [id, name] = value.split(' - ');
+        if (!selectedDefects.has(id)) {
+          if (showingTop) {
             selectedContainer.innerHTML = '';
             showingTop = false;
           }
+          const box = document.createElement('div');
+          box.className = 'chart-item chart-small selected-defect';
+
+          const title = document.createElement('h4');
+          title.className = 'chart-title';
+          title.textContent = `${id} - ${name}`;
+          box.appendChild(title);
+
+          const grid = document.createElement('div');
+          grid.className = 'grafico-grid';
+          box.appendChild(grid);
+
+          const closeBtn = document.createElement('button');
+          closeBtn.className = 'close-btn';
+          closeBtn.textContent = '✕';
+
+          const item = document.createElement('div');
+          item.className = 'sidebar-selected-defect';
+          const nameSpan = document.createElement('span');
+          nameSpan.textContent = `${id} - ${name}`;
+          item.appendChild(nameSpan);
+          const removeBtn = document.createElement('button');
+          removeBtn.className = 'remove-defect-btn';
+          removeBtn.textContent = '✕';
+          item.appendChild(removeBtn);
+
+          const remove = (e) => {
+            if (e) e.stopPropagation();
+            selectedContainer.removeChild(box);
+            sidebarList.removeChild(item);
+            selectedDefects.delete(id);
+            if (selectedDefects.size === 0) {
+              selectedContainer.innerHTML = '';
+              showingTop = false;
+            }
+            updateLayout();
+            updateSidebarVisibility();
+            updateSelectedDefectCounts();
+          };
+
+          closeBtn.addEventListener('click', remove);
+          removeBtn.addEventListener('click', remove);
+
+          box.appendChild(closeBtn);
+
+          selectedContainer.appendChild(box);
+          sidebarList.appendChild(item);
+          selectedDefects.set(id, { box, item, name });
           updateLayout();
           updateSidebarVisibility();
-        };
-
-        closeBtn.addEventListener('click', remove);
-        removeBtn.addEventListener('click', remove);
-
-        box.appendChild(closeBtn);
-
-        selectedContainer.appendChild(box);
-        sidebarList.appendChild(item);
-        selectedDefects.set(value, { box, item });
-        updateLayout();
-        updateSidebarVisibility();
+          updateSelectedDefectCounts();
+        }
       }
 
       defectSelect.value = '';
