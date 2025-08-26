@@ -77,5 +77,55 @@ def get_errors():
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
+
+@app.route('/get_top_defects', methods=['GET'])
+def get_top_defects():
+    start = request.args.get('start')
+    end = request.args.get('end')
+    order = request.args.get('order', 'desc').lower()
+    limit = request.args.get('limit', type=int, default=10)
+    cells = request.args.getlist('cell')
+    ids = request.args.getlist('id')
+    if not start or not end:
+        return jsonify({'success': False, 'message': 'Missing date range'}), 400
+
+    base_query = (
+        """
+        SELECT e.cod AS id, e.name AS name, COUNT(*) AS total
+        FROM sample_inspection si
+        JOIN sample_inspection_error sie ON si.id = sie.sample_inspection_id
+        JOIN error e ON sie.error_id = e.cod
+        WHERE si.audit = 0 AND DATE(si.ts) BETWEEN :start AND :end
+        """
+    )
+    params = {'start': start, 'end': end}
+    if cells:
+        placeholders = ",".join(f":cell{i}" for i in range(len(cells)))
+        base_query += f" AND si.cell_id IN ({placeholders})"
+        for i, cell in enumerate(cells):
+            params[f"cell{i}"] = cell
+    if ids:
+        placeholders = ",".join(f":id{i}" for i in range(len(ids)))
+        base_query += f" AND e.cod IN ({placeholders})"
+        for i, id_ in enumerate(ids):
+            params[f"id{i}"] = id_
+    base_query += " GROUP BY e.cod, e.name"
+    if ids:
+        order_placeholders = ",".join(f":id{i}" for i in range(len(ids)))
+        base_query += f" ORDER BY FIELD(e.cod, {order_placeholders})"
+    else:
+        base_query += f" ORDER BY total {'ASC' if order == 'asc' else 'DESC'} LIMIT :limit"
+        params['limit'] = limit
+    try:
+        with engine.connect() as conn:
+            result = conn.execute(text(base_query), params).mappings().all()
+        defects = [
+            {'id': row['id'], 'name': row['name'], 'total': row['total']}
+            for row in result
+        ]
+        return jsonify({'success': True, 'defects': defects})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)
