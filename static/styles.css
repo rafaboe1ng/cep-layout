@@ -39,10 +39,10 @@
 }
 :root {
   --yellow: #fbc910;
-  --blue-dark: #25507a;
-  --blue-hover: #1a355e;
-  --panel-bg: #34495e;
-  --body-bg: #2c3e50;
+  --blue-dark: #023275;
+  --blue-hover: #04234d;
+  --panel-bg: #0048aa;
+  --body-bg: #022961;
   --text-light: #ecf0f1;
   --grafico-box-border: #8fd6ff;
 }
