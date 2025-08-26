@@ -67,20 +67,14 @@
             </h2>
             <div id="collapseCells" class="accordion-collapse collapse" aria-labelledby="headingCells" data-bs-parent="#filterAccordion">
               <div class="accordion-body">
-                <div class="checkbox-group">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="cell01" checked>
-                    <label class="form-check-label" for="cell01">UPS-01</label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="cell02" checked>
-                    <label class="form-check-label" for="cell02">UPS-02</label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="cell07" checked>
-                    <label class="form-check-label" for="cell07">UPS-07</label>
-                  </div>
-                </div>
+                <select id="cellFilter" class="form-select filter-select">
+                  <option value="">Selecione uma célula</option>
+                  <option value="UPS-01">UPS-01</option>
+                  <option value="UPS-02">UPS-02</option>
+                  <option value="UPS-07">UPS-07</option>
+                </select>
+                <button id="clearCellsBtn" class="btn btn-warning btn-sm mt-2 w-100" style="display:none;">Limpar Todos</button>
+                <div id="selectedCellsSidebar" class="selected-defects-sidebar"></div>
               </div>
             </div>
           </div>

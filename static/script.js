@@ -144,4 +144,57 @@ document.addEventListener('DOMContentLoaded', () => {
       defectSelect.value = '';
     });
   }
+
+  const cellSelect = document.getElementById('cellFilter');
+  const cellSidebar = document.getElementById('selectedCellsSidebar');
+  const clearCellsBtn = document.getElementById('clearCellsBtn');
+  if (cellSelect && cellSidebar && clearCellsBtn) {
+    const selectedCells = new Map();
+
+    function updateCellSidebarVisibility() {
+      clearCellsBtn.style.display = selectedCells.size > 0 ? '' : 'none';
+    }
+
+    clearCellsBtn.addEventListener('click', () => {
+      selectedCells.forEach((item) => {
+        if (item.parentNode) cellSidebar.removeChild(item);
+      });
+      selectedCells.clear();
+      updateCellSidebarVisibility();
+    });
+
+    cellSelect.addEventListener('change', () => {
+      const value = cellSelect.value;
+      if (value && !selectedCells.has(value)) {
+        const item = document.createElement('div');
+        item.className = 'sidebar-selected-defect';
+
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = value;
+        item.appendChild(nameSpan);
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-defect-btn';
+        removeBtn.textContent = '✕';
+        item.appendChild(removeBtn);
+
+        const remove = (e) => {
+          if (e) e.stopPropagation();
+          cellSidebar.removeChild(item);
+          selectedCells.delete(value);
+          updateCellSidebarVisibility();
+        };
+
+        removeBtn.addEventListener('click', remove);
+
+        cellSidebar.appendChild(item);
+        selectedCells.set(value, item);
+        updateCellSidebarVisibility();
+      }
+
+      cellSelect.value = '';
+    });
+
+    updateCellSidebarVisibility();
+  }
 });
