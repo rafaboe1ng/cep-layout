@@ -192,7 +192,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const title = topDefectTitles[i];
             if (!title) continue;
             const defect = data.defects[i];
-            title.textContent = defect ? `${defect.id} - ${defect.name}` : '';
+            title.textContent = defect
+              ? `${defect.id} - ${defect.name} (${defect.total})`
+              : '-';
           }
         }
       });
@@ -210,13 +212,16 @@ document.addEventListener('DOMContentLoaded', () => {
           data.defects.forEach((def) => {
             const box = document.createElement('div');
             box.className = 'chart-item chart-small';
+
             const title = document.createElement('h4');
             title.className = 'chart-title';
-            title.textContent = `${def.id} - ${def.name}`;
+            title.textContent = `${def.id} - ${def.name} (${def.total})`;
             box.appendChild(title);
+
             const grid = document.createElement('div');
             grid.className = 'grafico-grid';
             box.appendChild(grid);
+
             selectedContainer.appendChild(box);
           });
           updateLayout();
