@@ -168,7 +168,7 @@ def get_u_chart():
     start = request.args.get('start')
     end = request.args.get('end')
     cells = request.args.getlist('cell')
-    error_id = request.args.get('error', type=int)
+    error_cod = request.args.get('error')
     if not start or not end:
         return jsonify({'success': False, 'message': 'Missing date range'}), 400
 
@@ -193,15 +193,16 @@ def get_u_chart():
             params[f"cell{i}"] = cell
 
     error_filter = ''
-    if error_id is not None:
-        error_filter = " AND sie.error_id = :error_id"
-        params['error_id'] = error_id
+    if error_cod:
+        error_filter = " AND e.cod = :error_cod"
+        params['error_cod'] = error_cod
 
     baseline_query = f"""
         SELECT COUNT(sie.error_id) AS total_defects,
                COUNT(DISTINCT si.id) AS total_inspections
         FROM sample_inspection si
         LEFT JOIN sample_inspection_error sie ON si.id = sie.sample_inspection_id
+        LEFT JOIN error e ON sie.error_id = e.id
         WHERE si.audit = 0
           AND DATE(si.ts) BETWEEN :b_start AND :b_end
           {cell_filter}
@@ -214,6 +215,7 @@ def get_u_chart():
                COUNT(sie.error_id) AS total_defects
         FROM sample_inspection si
         LEFT JOIN sample_inspection_error sie ON si.id = sie.sample_inspection_id
+        LEFT JOIN error e ON sie.error_id = e.id
         WHERE si.audit = 0
           AND DATE(si.ts) BETWEEN :start AND :end
           {cell_filter}
@@ -246,6 +248,8 @@ def get_u_chart():
             'u': round(u, 4),
             'ucl': round(ucl, 4),
             'lcl': round(lcl, 4),
+            'total_inspections': insp,
+            'total_defects': defects,
         })
 
     return jsonify({'success': True, 'u_bar': round(u_bar, 4), 'data': data})
