@@ -1,3 +1,7 @@
+/* Esconde o bloco de defeitos quando a sidebar está minimizada */
+.sidebar.minimized .accordion-item:nth-child(3) {
+  display: none !important;
+}
 /* Borda azul bebê para o grid do gráfico */
 .grafico-grid {
   width: 100%;
