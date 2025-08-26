@@ -31,9 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let end;
     switch (dateSelect.value) {
       case 'today':
-        // Include the four previous days so the chart has context
-        end = today;
-        start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 4);
+        start = end = today;
         break;
       case 'yesterday':
         // Show five consecutive days ending yesterday
@@ -204,6 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         container.innerHTML = '';
         const canvas = document.createElement('canvas');
+        canvas.style.backgroundColor = '#fff';
         container.appendChild(canvas);
         container._chart = new Chart(canvas.getContext('2d'), {
           type: 'line',
@@ -230,6 +229,11 @@ document.addEventListener('DOMContentLoaded', () => {
           options: {
             responsive: true,
             maintainAspectRatio: false,
+            scales: {
+              x: {
+                offset: true,
+              },
+            },
           },
         });
       });

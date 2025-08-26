@@ -9,7 +9,7 @@
   min-height: 120px;
   border: 3px solid #8fd6ff;
   border-radius: 12px;
-  background: transparent;
+  background: #ffffff;
   margin: 0 auto;
   box-sizing: border-box;
   transition: border-color 0.3s;
@@ -42,7 +42,7 @@
   --blue-dark: #023275;
   --blue-hover: #04234d;
   --panel-bg: #0048aa;
-  --body-bg: #f0f0f0;
+  --body-bg: #0048aa;
   --text-light: #ecf0f1;
   --grafico-box-border: #8fd6ff;
 }
