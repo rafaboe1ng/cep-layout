@@ -7,9 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Mostrar custom-date-range só se for Personalizado
   const dateSelect = document.getElementById('dateFilter');
   const customRange = document.getElementById('customDateRange');
+  const startDateInput = document.getElementById('startDate');
+  const endDateInput = document.getElementById('endDate');
+  const selectedCells = new Map();
+
   function toggleCustomRange() {
     if (dateSelect.value === 'custom') {
       customRange.style.display = '';
@@ -17,10 +20,95 @@ document.addEventListener('DOMContentLoaded', () => {
       customRange.style.display = 'none';
     }
   }
+
+  function getDateRange() {
+    const today = new Date();
+    let start;
+    let end;
+    switch (dateSelect.value) {
+      case 'today':
+        start = end = today;
+        break;
+      case 'yesterday':
+        start = end = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
+        break;
+      case 'last3':
+        start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 2);
+        end = today;
+        break;
+      case 'last7':
+        start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6);
+        end = today;
+        break;
+      case 'last30':
+        start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 29);
+        end = today;
+        break;
+      case 'currentWeek':
+        start = new Date(today);
+        start.setDate(today.getDate() - today.getDay() + 1);
+        end = today;
+        break;
+      case 'previousWeek':
+        end = new Date(today);
+        end.setDate(end.getDate() - end.getDay());
+        start = new Date(end);
+        start.setDate(end.getDate() - 6);
+        break;
+      case 'currentMonth':
+        start = new Date(today.getFullYear(), today.getMonth(), 1);
+        end = today;
+        break;
+      case 'previousMonth':
+        start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        end = new Date(today.getFullYear(), today.getMonth(), 0);
+        break;
+      case 'currentYear':
+        start = new Date(today.getFullYear(), 0, 1);
+        end = today;
+        break;
+      case 'previousYear':
+        start = new Date(today.getFullYear() - 1, 0, 1);
+        end = new Date(today.getFullYear() - 1, 11, 31);
+        break;
+      case 'custom':
+        start = startDateInput.value ? new Date(startDateInput.value) : today;
+        end = endDateInput.value ? new Date(endDateInput.value) : today;
+        break;
+      default:
+        start = end = today;
+    }
+    const pad = (n) => String(n).padStart(2, '0');
+    const format = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    return { start: format(start), end: format(end) };
+  }
+
+  function fetchTotals() {
+    if (!dateSelect) return;
+    const { start, end } = getDateRange();
+    const params = new URLSearchParams({ start, end });
+    selectedCells.forEach((_, cell) => params.append('cell', cell));
+    fetch(`/get_counts?${params.toString()}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) {
+          const insp = document.getElementById('totalInspections');
+          const def = document.getElementById('totalDefects');
+          if (insp) insp.textContent = `Inspeções: ${data.total_inspections}`;
+          if (def) def.textContent = `Defeitos: ${data.total_defects}`;
+        }
+      });
+  }
+
   if (dateSelect && customRange) {
     toggleCustomRange();
-    dateSelect.addEventListener('change', toggleCustomRange);
+    dateSelect.addEventListener('change', () => {
+      toggleCustomRange();
+      fetchTotals();
+    });
   }
+  if (startDateInput) startDateInput.addEventListener('change', fetchTotals);
+  if (endDateInput) endDateInput.addEventListener('change', fetchTotals);
 
   // Atualiza gráficos conforme defeitos selecionados
   const defectSelect = document.getElementById('defectFilter');
@@ -149,8 +237,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const cellSidebar = document.getElementById('selectedCellsSidebar');
   const clearCellsBtn = document.getElementById('clearCellsBtn');
   if (cellSelect && cellSidebar && clearCellsBtn) {
-    const selectedCells = new Map();
-
     function updateCellSidebarVisibility() {
       clearCellsBtn.style.display = selectedCells.size > 0 ? '' : 'none';
     }
@@ -161,6 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       selectedCells.clear();
       updateCellSidebarVisibility();
+      fetchTotals();
     });
 
     cellSelect.addEventListener('change', () => {
@@ -183,6 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
           cellSidebar.removeChild(item);
           selectedCells.delete(value);
           updateCellSidebarVisibility();
+          fetchTotals();
         };
 
         removeBtn.addEventListener('click', remove);
@@ -190,6 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cellSidebar.appendChild(item);
         selectedCells.set(value, item);
         updateCellSidebarVisibility();
+        fetchTotals();
       }
 
       cellSelect.value = '';
@@ -197,4 +286,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateCellSidebarVisibility();
   }
+
+  fetchTotals();
 });
