@@ -33,7 +33,7 @@ def get_counts():
 
     base_query = (
         """
-        SELECT COUNT(DISTINCT si.id) AS total_inspections,
+        SELECT COUNT(si.id) AS total_inspections,
                COUNT(sie.error_id) AS total_defects
         FROM sample_inspection si
         LEFT JOIN sample_inspection_error sie ON si.id = sie.sample_inspection_id
