@@ -12,6 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const startDateInput = document.getElementById('startDate');
   const endDateInput = document.getElementById('endDate');
   const selectedCells = new Map();
+  const lastUpdateEl = document.getElementById('lastUpdate');
+  const updateNowBtn = document.getElementById('updateNowBtn');
 
   const toDbCell = (name) => name.replace('-', '').replace('UPS0', 'UPS');
 
@@ -86,11 +88,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function fetchTotals() {
-    if (!dateSelect) return;
+    if (!dateSelect) return Promise.resolve();
     const { start, end } = getDateRange();
     const params = new URLSearchParams({ start, end });
     selectedCells.forEach((_, cell) => params.append('cell', cell));
-    fetch(`/get_counts?${params.toString()}`)
+    return fetch(`/get_counts?${params.toString()}`)
       .then((r) => r.json())
       .then((data) => {
         if (data.success) {
@@ -106,11 +108,11 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleCustomRange();
     dateSelect.addEventListener('change', () => {
       toggleCustomRange();
-      refreshAll();
+      refreshAndUpdate();
     });
   }
-  if (startDateInput) startDateInput.addEventListener('change', refreshAll);
-  if (endDateInput) endDateInput.addEventListener('change', refreshAll);
+  if (startDateInput) startDateInput.addEventListener('change', refreshAndUpdate);
+  if (endDateInput) endDateInput.addEventListener('change', refreshAndUpdate);
 
   // Atualiza gráficos conforme defeitos selecionados
   const defectSelect = document.getElementById('defectFilter');
@@ -184,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function loadTop3() {
     const params = buildParams({ order: 'desc', limit: 3 });
-    fetch(`/get_top_defects?${params.toString()}`)
+    return fetch(`/get_top_defects?${params.toString()}`)
       .then((r) => r.json())
       .then((data) => {
         if (data.success) {
@@ -204,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const order = defectOrderSwitch && defectOrderSwitch.checked ? 'asc' : 'desc';
     const limit = defectQuantityInput ? parseInt(defectQuantityInput.value) || 6 : 6;
     const params = buildParams({ order, limit });
-    fetch(`/get_top_defects?${params.toString()}`)
+    return fetch(`/get_top_defects?${params.toString()}`)
       .then((r) => r.json())
       .then((data) => {
         if (data.success) {
@@ -251,10 +253,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateSelectedDefectCounts() {
-    if (selectedDefects.size === 0) return;
+    if (selectedDefects.size === 0) return Promise.resolve();
     const params = buildParams();
     selectedDefects.forEach((_, id) => params.append('id', id));
-    fetch(`/get_top_defects?${params.toString()}`)
+    return fetch(`/get_top_defects?${params.toString()}`)
       .then((r) => r.json())
       .then((data) => {
         if (data.success) {
@@ -275,16 +277,29 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function refreshAll() {
-    fetchTotals();
-    loadTop3();
+    const tasks = [fetchTotals(), loadTop3()];
     if (selectedDefects.size > 0) {
       renderSelectedDefects();
-      updateSelectedDefectCounts();
+      tasks.push(updateSelectedDefectCounts());
     } else if (showingTop) {
-      loadTopDefects();
+      tasks.push(loadTopDefects());
     } else {
       selectedContainer.innerHTML = '';
     }
+    return Promise.all(tasks);
+  }
+
+  function updateLastUpdate() {
+    if (!lastUpdateEl) return;
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const date = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+    const time = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    lastUpdateEl.textContent = `Última atualização: ${date} ${time}`;
+  }
+
+  function refreshAndUpdate() {
+    return refreshAll().then(updateLastUpdate);
   }
 
   if (defectSelect) {
@@ -319,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
       selectedContainer.innerHTML = '';
       updateLayout();
       updateSidebarVisibility();
-      refreshAll();
+      refreshAndUpdate();
     });
 
     defectSelect.addEventListener('change', () => {
@@ -368,7 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             updateLayout();
             updateSidebarVisibility();
-            updateSelectedDefectCounts();
+            updateSelectedDefectCounts().then(updateLastUpdate);
           };
 
           closeBtn.addEventListener('click', remove);
@@ -381,7 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
           selectedDefects.set(id, { box, item, name });
           updateLayout();
           updateSidebarVisibility();
-          updateSelectedDefectCounts();
+          updateSelectedDefectCounts().then(updateLastUpdate);
         }
       }
 
@@ -402,7 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       selectedContainer.innerHTML = '';
       showingTop = true;
-      refreshAll();
+      refreshAndUpdate();
     });
   }
 
@@ -420,7 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       selectedCells.clear();
       updateCellSidebarVisibility();
-      refreshAll();
+      refreshAndUpdate();
     });
 
     cellSelect.addEventListener('change', () => {
@@ -444,7 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
           cellSidebar.removeChild(item);
           selectedCells.delete(dbValue);
           updateCellSidebarVisibility();
-          refreshAll();
+          refreshAndUpdate();
         };
 
         removeBtn.addEventListener('click', remove);
@@ -452,7 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cellSidebar.appendChild(item);
         selectedCells.set(dbValue, item);
         updateCellSidebarVisibility();
-        refreshAll();
+        refreshAndUpdate();
       }
 
       cellSelect.value = '';
@@ -461,5 +476,8 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCellSidebarVisibility();
   }
 
-  refreshAll();
+  if (updateNowBtn) updateNowBtn.addEventListener('click', refreshAndUpdate);
+
+  refreshAndUpdate();
+  setInterval(refreshAndUpdate, 5 * 60 * 1000);
 });
