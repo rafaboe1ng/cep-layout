@@ -1,8 +1,15 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify, redirect, url_for, request
+from sqlalchemy import create_engine, text
+import os
 
 app = Flask(__name__)
 
-from flask import redirect, url_for, request
+# Banco de dados
+DB_CONN_STRING = os.getenv(
+    "DB_CONN_STRING_VM",
+    "mysql+pymysql://nikolas:EFD%40puc2023@54.232.255.210/db_puc",
+)
+engine = create_engine(DB_CONN_STRING)
 
 @app.route('/', methods=['GET', 'POST'])
 def dashboard():
@@ -14,6 +21,44 @@ def dashboard():
 @app.route('/about')
 def about():
     return 'About'
+
+
+@app.route('/get_counts', methods=['GET'])
+def get_counts():
+    start = request.args.get('start')
+    end = request.args.get('end')
+    cells = request.args.getlist('cell')
+    if not start or not end:
+        return jsonify({'success': False, 'message': 'Missing date range'}), 400
+
+    base_query = (
+        """
+        SELECT COUNT(DISTINCT si.id) AS total_inspections,
+               COUNT(sie.error_id) AS total_defects
+        FROM sample_inspection si
+        LEFT JOIN sample_inspection_error sie ON si.id = sie.sample_inspection_id
+        WHERE si.audit = 0 AND DATE(si.ts) BETWEEN :start AND :end
+        """
+    )
+    params = {'start': start, 'end': end}
+    if cells:
+        placeholders = ",".join(f":cell{i}" for i in range(len(cells)))
+        base_query += f" AND si.cell_id IN ({placeholders})"
+        for i, cell in enumerate(cells):
+            params[f"cell{i}"] = cell
+
+    try:
+        with engine.connect() as conn:
+            result = conn.execute(text(base_query), params).mappings().first()
+        return jsonify(
+            {
+                'success': True,
+                'total_inspections': result["total_inspections"],
+                'total_defects': result["total_defects"],
+            }
+        )
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
