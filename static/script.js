@@ -24,9 +24,15 @@ document.addEventListener('DOMContentLoaded', () => {
       [datePart, timePart] = str.split(' ');
     }
     const [year, month, day] = datePart.split('-').map(Number);
-    const [hours = 0, minutes = 0, seconds = 0] = timePart.split(':').map(Number);
+    const [hours = 0, minutes = 0, seconds = 0] = timePart
+      .split(':')
+      .map(Number);
     const pad = (n) => String(n).padStart(2, '0');
-    return `${pad(day)}/${pad(month)}/${year} ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+    const dateFormatted = `${pad(day)}/${pad(month)}/${year}`;
+    if (hours === 0 && minutes === 0 && seconds === 0) {
+      return dateFormatted;
+    }
+    return `${dateFormatted} ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
   };
 
   function toggleCustomRange() {
