@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         break;
       case 'currentYear':
         start = new Date(today.getFullYear(), 0, 1);
-        end = new Date(today.getFullYear(), 11, 31);
+        end = today;
         break;
       case 'previousYear':
         start = new Date(today.getFullYear() - 1, 0, 1);
@@ -186,7 +186,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function buildParams(extra = {}) {
     const { start, end } = getDateRange();
-    const params = new URLSearchParams({ start, end, ...extra });
+    const paramsObj = { start, end, ...extra };
+    if (
+      dateSelect &&
+      (dateSelect.value === 'currentYear' || dateSelect.value === 'previousYear')
+    ) {
+      paramsObj.bucket = 'biweekly';
+    }
+    const params = new URLSearchParams(paramsObj);
     selectedCells.forEach((_, cell) => params.append('cell', cell));
     return params;
   }
