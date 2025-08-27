@@ -147,22 +147,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const items = Array.from(selectedContainer.querySelectorAll('.chart-item'));
     const count = items.length;
 
-    // Clear any manual positioning from a previous layout
+    // Reset previous manual positioning
     items.forEach((item) => {
       item.style.gridRow = '';
       item.style.gridColumn = '';
     });
 
-    if (count === 0) {
-      selectedContainer.style.gridTemplateColumns = '';
-      selectedContainer.style.gridAutoRows = '';
-      return;
-    }
-
-    // Use at most two rows and let CSS Grid handle item placement
-    const cols = Math.ceil(count / 2);
-    selectedContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-    selectedContainer.style.gridAutoRows = 'auto';
+    // Toggle helper class for odd layouts
+    selectedContainer.classList.toggle('odd-count', count % 2 === 1 && count > 1);
   }
 
   function buildParams(extra = {}) {
