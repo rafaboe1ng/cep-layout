@@ -380,7 +380,6 @@ body {
 
 .charts-grid-custom.single-row {
   grid-template-rows: 1fr;
-  grid-template-columns: 1fr;
 }
 
 
@@ -407,10 +406,6 @@ body {
   width: 100%;
   height: 100%;
   min-width: 0;
-}
-
-.charts-grid-custom.single-row .chart-hoje {
-  grid-column: 1 / -1;
 }
 
 .top3-area {
@@ -452,16 +447,11 @@ body {
 
 .selected-defects-grid {
   display: grid;
-  gap: 24px;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
   width: 100%;
   flex: 1;
   overflow-y: auto;
   align-content: start;
-}
-
-.selected-defects-grid.odd-count .chart-item:first-child {
-  grid-column: span 2;
 }
 
 .selected-defects-grid .chart-item {
