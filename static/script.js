@@ -18,9 +18,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const toDbCell = (name) => name.replace('-', '').replace('UPS0', 'UPS');
 
   const formatDateTime = (str) => {
-    const d = new Date(str);
+    if (!str) return '';
+    let [datePart, timePart = '00:00:00'] = str.split('T');
+    if (str.includes(' ')) {
+      [datePart, timePart] = str.split(' ');
+    }
+    const [year, month, day] = datePart.split('-').map(Number);
+    const [hours = 0, minutes = 0, seconds = 0] = timePart.split(':').map(Number);
     const pad = (n) => String(n).padStart(2, '0');
-    return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    return `${pad(day)}/${pad(month)}/${year} ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
   };
 
   function toggleCustomRange() {
