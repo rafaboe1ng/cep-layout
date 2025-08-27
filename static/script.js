@@ -19,20 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const formatDateTime = (str) => {
     if (!str) return '';
-    let [datePart, timePart = '00:00:00'] = str.split('T');
-    if (str.includes(' ')) {
-      [datePart, timePart] = str.split(' ');
-    }
-    const [year, month, day] = datePart.split('-').map(Number);
-    const [hours = 0, minutes = 0, seconds = 0] = timePart
-      .split(':')
-      .map(Number);
-    const pad = (n) => String(n).padStart(2, '0');
-    const dateFormatted = `${pad(day)}/${pad(month)}/${year}`;
-    if (hours === 0 && minutes === 0 && seconds === 0) {
-      return dateFormatted;
-    }
-    return `${dateFormatted} ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+    const date = new Date(str.endsWith('Z') ? str : str + 'Z');
+    const opts = { timeZone: 'America/Sao_Paulo', hour12: false };
+    const datePart = date.toLocaleDateString('pt-BR', opts);
+    const timePart = date.toLocaleTimeString('pt-BR', opts);
+    return timePart === '00:00:00' ? datePart : `${datePart} ${timePart}`;
   };
 
   function toggleCustomRange() {
@@ -502,9 +493,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateLastUpdate() {
     if (!lastUpdateEl) return;
     const now = new Date();
-    const pad = (n) => String(n).padStart(2, '0');
-    const date = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
-    const time = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    const opts = { timeZone: 'America/Sao_Paulo', hour12: false };
+    const date = now.toLocaleDateString('pt-BR', opts);
+    const time = now.toLocaleTimeString('pt-BR', opts);
     lastUpdateEl.textContent = `Última atualização: ${date} ${time}`;
   }
 
