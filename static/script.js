@@ -150,44 +150,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (count === 0) {
       selectedContainer.style.gridTemplateColumns = '';
       selectedContainer.style.gridTemplateRows = '';
+      selectedContainer.style.gridAutoRows = '';
       return;
     }
 
-    let top, bottom;
-    if (count % 2 === 0) {
-      top = bottom = count / 2;
-    } else if (count >= 3) {
-      top = Math.floor(count / 2);
-      bottom = count - top;
-    } else {
-      top = count;
-      bottom = 0;
-    }
-
-    const cols = Math.max(top, bottom);
+    const cols = count <= 2 ? count : Math.ceil(count / 2);
     selectedContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-    selectedContainer.style.gridTemplateRows = bottom > 0 ? '1fr 1fr' : '1fr';
+    selectedContainer.style.gridTemplateRows = '';
+    selectedContainer.style.gridAutoRows = '1fr';
 
-    const placeRow = (startIdx, n, row) => {
-      if (n === 0) return;
-      const baseSpan = Math.floor(cols / n) || 1;
-      let leftover = cols - baseSpan * n;
-      let colStart = 1;
-      for (let i = 0; i < n; i++) {
-        const item = items[startIdx + i];
-        let span = baseSpan;
-        if (leftover > 0) {
-          span += 1;
-          leftover -= 1;
-        }
-        item.style.gridRow = String(row);
-        item.style.gridColumn = `${colStart} / span ${span}`;
-        colStart += span;
-      }
-    };
-
-    placeRow(0, top, 1);
-    placeRow(top, bottom, 2);
+    items.forEach((item) => {
+      item.style.gridColumn = '';
+      item.style.gridRow = '';
+    });
   }
 
   function buildParams(extra = {}) {
@@ -217,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const lclData = data.data.map((d) => d.lcl);
         const step = errorId ? 0.25 : 0.5;
         const maxValue = Math.max(...uData, ...uclData, step);
-        const yMax = Math.ceil(maxValue / step) * step;
+        const yMax = Number((Math.ceil(maxValue / step) * step).toFixed(2));
         if (container._chart) {
           container._chart.destroy();
         }
@@ -257,7 +232,10 @@ document.addEventListener('DOMContentLoaded', () => {
               y: {
                 min: 0,
                 max: yMax,
-                ticks: { stepSize: step },
+                ticks: {
+                  stepSize: step,
+                  callback: (value) => Number(value).toFixed(2),
+                },
               },
             },
           },
