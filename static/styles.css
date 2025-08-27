@@ -454,9 +454,15 @@ body {
   align-content: start;
 }
 
-.selected-defects-grid .chart-item {
-  height: auto;
-}
+/* Por padro, os itens seguem altura do contedo. */
+.selected-defects-grid .chart-item { height: auto; }
+
+/* Quando a grade estiver em modo de preenchimento completo,
+   as linhas tam altura fracionada e os itens acompanham. */
+.selected-defects-grid.fill-grid { align-content: stretch; align-items: stretch; }
+.selected-defects-grid.fill-grid .chart-item { height: 100%; min-height: 0; }
+/* O container do canvas deve ocupar o restante do card sem extrapolar. */
+.selected-defects-grid.fill-grid .grafico-grid { flex: 1; height: auto; min-height: 0; }
 
 .selected-defect {
   position: relative;

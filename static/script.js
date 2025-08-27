@@ -147,22 +147,84 @@ document.addEventListener('DOMContentLoaded', () => {
     const items = Array.from(selectedContainer.querySelectorAll('.chart-item'));
     const count = items.length;
 
-    // Clear any manual positioning from a previous layout
+    // Reset any previous manual positioning
     items.forEach((item) => {
       item.style.gridRow = '';
       item.style.gridColumn = '';
+      item.style.height = '';
     });
 
     if (count === 0) {
+      selectedContainer.classList.remove('fill-grid');
       selectedContainer.style.gridTemplateColumns = '';
+      selectedContainer.style.gridTemplateRows = '';
       selectedContainer.style.gridAutoRows = '';
       return;
     }
 
-    // Use at most two rows and let CSS Grid handle item placement
-    const cols = Math.ceil(count / 2);
-    selectedContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-    selectedContainer.style.gridAutoRows = 'auto';
+    // Enable full-height fill behavior scoped to this grid
+    selectedContainer.classList.add('fill-grid');
+
+    // Layout rules:
+    // - 1: ocupa toda a área entre header/footer e sidebar
+    // - pares: mesma quantidade em cima e embaixo, ocupando todo o espaço
+    // - ímpares: o primeiro vale por 2 e segue a lógica do par
+
+    if (count === 1) {
+      selectedContainer.style.gridTemplateColumns = '1fr';
+      selectedContainer.style.gridTemplateRows = '1fr';
+      selectedContainer.style.gridAutoRows = '';
+      // First item fills all columns (only one column anyway)
+      items[0].style.gridColumn = '1 / -1';
+      items[0].style.height = '100%';
+      return;
+    }
+
+    if (count === 2) {
+      // 1 coluna, 2 linhas iguais
+      selectedContainer.style.gridTemplateColumns = '1fr';
+      selectedContainer.style.gridTemplateRows = '1fr 1fr';
+      selectedContainer.style.gridAutoRows = '';
+      items.forEach((it) => (it.style.height = '100%'));
+      return;
+    }
+
+    if (count === 3) {
+      // 2 colunas; 1ª linha: item 1 ocupa 2 colunas; 2ª linha: 2 itens
+      selectedContainer.style.gridTemplateColumns = '1fr 1fr';
+      selectedContainer.style.gridTemplateRows = '1fr 1fr';
+      selectedContainer.style.gridAutoRows = '';
+      items[0].style.gridColumn = '1 / span 2';
+      items.forEach((it) => (it.style.height = '100%'));
+      return;
+    }
+
+    if (count === 4) {
+      // 2 x 2, linhas com alturas iguais
+      selectedContainer.style.gridTemplateColumns = '1fr 1fr';
+      selectedContainer.style.gridTemplateRows = '1fr 1fr';
+      selectedContainer.style.gridAutoRows = '';
+      items.forEach((it) => (it.style.height = '100%'));
+      return;
+    }
+
+    // 5 ou mais (ímpar ou par > 4)
+    // Par: k = n/2 colunas e 2 linhas iguais
+    // Ímpar: colunas = ceil((n+1)/2); item[0] ocupa 2 colunas na primeira linha
+    if (count % 2 === 0) {
+      const cols = count / 2;
+      selectedContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+      selectedContainer.style.gridTemplateRows = '1fr 1fr';
+      selectedContainer.style.gridAutoRows = '';
+      items.forEach((it) => (it.style.height = '100%'));
+    } else {
+      const cols = Math.ceil((count + 1) / 2);
+      selectedContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+      selectedContainer.style.gridTemplateRows = '1fr 1fr';
+      selectedContainer.style.gridAutoRows = '';
+      items[0].style.gridColumn = '1 / span 2';
+      items.forEach((it) => (it.style.height = '100%'));
+    }
   }
 
   function buildParams(extra = {}) {
