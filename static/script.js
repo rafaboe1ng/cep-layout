@@ -147,36 +147,41 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    if (count === 1) {
-      selectedContainer.style.gridTemplateColumns = '1fr';
-      selectedContainer.style.gridTemplateRows = '1fr';
-      items[0].style.gridColumn = '1 / span 1';
-      items[0].style.gridRow = '1';
-      return;
-    }
-
-    selectedContainer.style.gridTemplateColumns = 'repeat(2, 1fr)';
-    const rows =
-      count % 2 === 0 ? count / 2 : 1 + Math.ceil((count - 1) / 2);
-    selectedContainer.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-
-    if (count % 2 === 1) {
-      items[0].style.gridColumn = '1 / span 2';
-      items[0].style.gridRow = '1';
-      for (let i = 1; i < count; i++) {
-        const row = Math.floor((i - 1) / 2) + 2;
-        const col = ((i - 1) % 2) + 1;
-        items[i].style.gridColumn = `${col} / span 1`;
-        items[i].style.gridRow = String(row);
-      }
+    let top, bottom;
+    if (count % 2 === 0) {
+      top = bottom = count / 2;
+    } else if (count >= 3) {
+      top = Math.floor(count / 2);
+      bottom = count - top;
     } else {
-      for (let i = 0; i < count; i++) {
-        const row = Math.floor(i / 2) + 1;
-        const col = (i % 2) + 1;
-        items[i].style.gridColumn = `${col} / span 1`;
-        items[i].style.gridRow = String(row);
-      }
+      top = count;
+      bottom = 0;
     }
+
+    const cols = Math.max(top, bottom);
+    selectedContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    selectedContainer.style.gridTemplateRows = bottom > 0 ? '1fr 1fr' : '1fr';
+
+    const placeRow = (startIdx, n, row) => {
+      if (n === 0) return;
+      const baseSpan = Math.floor(cols / n) || 1;
+      let leftover = cols - baseSpan * n;
+      let colStart = 1;
+      for (let i = 0; i < n; i++) {
+        const item = items[startIdx + i];
+        let span = baseSpan;
+        if (leftover > 0) {
+          span += 1;
+          leftover -= 1;
+        }
+        item.style.gridRow = String(row);
+        item.style.gridColumn = `${colStart} / span ${span}`;
+        colStart += span;
+      }
+    };
+
+    placeRow(0, top, 1);
+    placeRow(top, bottom, 2);
   }
 
   function buildParams(extra = {}) {
