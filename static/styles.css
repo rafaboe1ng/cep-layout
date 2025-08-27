@@ -63,7 +63,7 @@ html, body {
 
 body {
   margin: 0;
-  background: var(--body-bg);
+  background-color: var(--body-bg);
   height: 100vh;
   display: flex;
   flex-direction: column;

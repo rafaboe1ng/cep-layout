@@ -192,59 +192,78 @@ def get_u_chart():
         for i, cell in enumerate(cells):
             params[f"cell{i}"] = cell
 
+    error_join = ''
     error_filter = ''
     if error_cod:
-        error_filter = " AND e.cod = :error_cod"
+        error_join = ' JOIN error e ON sie.error_id = e.id'
+        error_filter = ' AND e.cod = :error_cod'
         params['error_cod'] = error_cod
 
-    baseline_query = f"""
-        SELECT COUNT(sie.error_id) AS total_defects,
-               COUNT(DISTINCT si.id) AS total_inspections
+    baseline_insp_query = f"""
+        SELECT COUNT(DISTINCT si.id) AS total
         FROM sample_inspection si
-        LEFT JOIN sample_inspection_error sie ON si.id = sie.sample_inspection_id
-        LEFT JOIN error e ON sie.error_id = e.id
+        WHERE si.audit = 0
+          AND DATE(si.ts) BETWEEN :b_start AND :b_end
+          {cell_filter}
+    """
+
+    baseline_defect_query = f"""
+        SELECT COUNT(sie.error_id) AS total
+        FROM sample_inspection si
+        JOIN sample_inspection_error sie ON si.id = sie.sample_inspection_id
+        {error_join}
         WHERE si.audit = 0
           AND DATE(si.ts) BETWEEN :b_start AND :b_end
           {cell_filter}
           {error_filter}
     """
 
-    daily_query = f"""
-        SELECT DATE(si.ts) AS date,
-               COUNT(DISTINCT si.id) AS total_inspections,
-               COUNT(sie.error_id) AS total_defects
+    daily_insp_query = f"""
+        SELECT DATE(si.ts) AS date, COUNT(DISTINCT si.id) AS total
         FROM sample_inspection si
-        LEFT JOIN sample_inspection_error sie ON si.id = sie.sample_inspection_id
-        LEFT JOIN error e ON sie.error_id = e.id
+        WHERE si.audit = 0
+          AND DATE(si.ts) BETWEEN :start AND :end
+          {cell_filter}
+        GROUP BY DATE(si.ts)
+    """
+
+    daily_defect_query = f"""
+        SELECT DATE(si.ts) AS date, COUNT(sie.error_id) AS total
+        FROM sample_inspection si
+        JOIN sample_inspection_error sie ON si.id = sie.sample_inspection_id
+        {error_join}
         WHERE si.audit = 0
           AND DATE(si.ts) BETWEEN :start AND :end
           {cell_filter}
           {error_filter}
         GROUP BY DATE(si.ts)
-        ORDER BY DATE(si.ts)
     """
 
     try:
         with engine.connect() as conn:
-            base = conn.execute(text(baseline_query), params).mappings().first()
-            rows = conn.execute(text(daily_query), params).mappings().all()
+            insp_base = conn.execute(text(baseline_insp_query), params).scalar() or 0
+            defect_base = conn.execute(text(baseline_defect_query), params).scalar() or 0
+            insp_rows = conn.execute(text(daily_insp_query), params).mappings().all()
+            defect_rows = conn.execute(text(daily_defect_query), params).mappings().all()
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
-    insp_base = base['total_inspections'] or 0
-    defect_base = base['total_defects'] or 0
     u_bar = defect_base / insp_base if insp_base else 0.0
 
+    insp_map = {row['date']: row['total'] for row in insp_rows}
+    defect_map = {row['date']: row['total'] for row in defect_rows}
+    dates = sorted(set(insp_map) | set(defect_map))
+
     data = []
-    for row in rows:
-        insp = row['total_inspections'] or 0
-        defects = row['total_defects'] or 0
+    for dt in dates:
+        insp = insp_map.get(dt, 0) or 0
+        defects = defect_map.get(dt, 0) or 0
         u = defects / insp if insp else 0.0
         sigma = (u_bar / insp) ** 0.5 if insp else 0.0
         ucl = u_bar + 3 * sigma
         lcl = max(0.0, u_bar - 3 * sigma)
         data.append({
-            'date': row['date'].isoformat(),
+            'date': dt.isoformat(),
             'u': round(u, 4),
             'ucl': round(ucl, 4),
             'lcl': round(lcl, 4),

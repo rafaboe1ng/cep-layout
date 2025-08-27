@@ -34,9 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
         start = end = today;
         break;
       case 'yesterday':
-        // Show five consecutive days ending yesterday
-        end = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
-        start = new Date(end.getFullYear(), end.getMonth(), end.getDate() - 4);
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        start = end = yesterday;
         break;
       case 'last3':
         start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 2);
@@ -51,15 +51,20 @@ document.addEventListener('DOMContentLoaded', () => {
         end = today;
         break;
       case 'currentWeek':
-        start = new Date(today);
-        start.setDate(today.getDate() - today.getDay() + 1);
-        end = today;
+        {
+          const day = today.getDay();
+          const diffToMonday = day === 0 ? -6 : 1 - day;
+          start = new Date(today.getFullYear(), today.getMonth(), today.getDate() + diffToMonday);
+          end = today;
+        }
         break;
       case 'previousWeek':
-        end = new Date(today);
-        end.setDate(end.getDate() - end.getDay());
-        start = new Date(end);
-        start.setDate(end.getDate() - 6);
+        {
+          const day = today.getDay();
+          const lastSunday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - day);
+          end = new Date(lastSunday.getFullYear(), lastSunday.getMonth(), lastSunday.getDate());
+          start = new Date(end.getFullYear(), end.getMonth(), end.getDate() - 6);
+        }
         break;
       case 'currentMonth':
         start = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -232,6 +237,9 @@ document.addEventListener('DOMContentLoaded', () => {
             scales: {
               x: {
                 offset: true,
+              },
+              y: {
+                ticks: { stepSize: 5 },
               },
             },
           },
