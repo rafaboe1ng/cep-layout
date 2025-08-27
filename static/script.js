@@ -202,6 +202,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const uData = data.data.map((d) => d.u);
         const uclData = data.data.map((d) => d.ucl);
         const lclData = data.data.map((d) => d.lcl);
+        const maxValue = Math.max(...uData, ...uclData, 0.5);
+        const yMax = Math.ceil(maxValue / 0.5) * 0.5;
         if (container._chart) {
           container._chart.destroy();
         }
@@ -239,7 +241,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 offset: true,
               },
               y: {
-                ticks: { stepSize: 5 },
+                min: 0,
+                max: yMax,
+                ticks: { stepSize: 0.5 },
               },
             },
           },
@@ -498,7 +502,7 @@ document.addEventListener('DOMContentLoaded', () => {
           selectedDefects.set(id, { box, item, name });
           updateLayout();
           updateSidebarVisibility();
-          updateSelectedDefectCounts().then(updateLastUpdate);
+          Promise.all([renderUChart(grid, id), updateSelectedDefectCounts()]).then(updateLastUpdate);
         }
       }
 
