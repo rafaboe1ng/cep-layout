@@ -174,6 +174,7 @@ def get_u_chart():
 
     try:
         start_date = _parse_date(start)
+        end_date = _parse_date(end)
         baseline_start, baseline_end = _previous_month_range(start_date)
     except ValueError:
         return jsonify({'success': False, 'message': 'Invalid date format'}), 400
@@ -199,6 +200,16 @@ def get_u_chart():
         error_filter = ' AND e.cod = :error_cod'
         params['error_cod'] = error_cod
 
+    delta_days = (end_date - start_date).days
+    if delta_days <= 1:
+        bucket = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(si.ts)/1800)*1800)"
+    elif delta_days <= 7:
+        bucket = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(si.ts)/28800)*28800)"
+    elif delta_days > 92:
+        bucket = "DATE_ADD(:start, INTERVAL FLOOR(DATEDIFF(DATE(si.ts), :start)/14)*14 DAY)"
+    else:
+        bucket = "DATE(si.ts)"
+
     baseline_insp_query = f"""
         SELECT COUNT(DISTINCT si.id) AS total
         FROM sample_inspection si
@@ -219,16 +230,16 @@ def get_u_chart():
     """
 
     daily_insp_query = f"""
-        SELECT DATE(si.ts) AS date, COUNT(DISTINCT si.id) AS total
+        SELECT {bucket} AS date, COUNT(DISTINCT si.id) AS total
         FROM sample_inspection si
         WHERE si.audit = 0
           AND DATE(si.ts) BETWEEN :start AND :end
           {cell_filter}
-        GROUP BY DATE(si.ts)
+        GROUP BY date
     """
 
     daily_defect_query = f"""
-        SELECT DATE(si.ts) AS date, COUNT(sie.error_id) AS total
+        SELECT {bucket} AS date, COUNT(sie.error_id) AS total
         FROM sample_inspection si
         JOIN sample_inspection_error sie ON si.id = sie.sample_inspection_id
         {error_join}
@@ -236,7 +247,7 @@ def get_u_chart():
           AND DATE(si.ts) BETWEEN :start AND :end
           {cell_filter}
           {error_filter}
-        GROUP BY DATE(si.ts)
+        GROUP BY date
     """
 
     try:
