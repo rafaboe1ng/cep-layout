@@ -202,8 +202,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const uData = data.data.map((d) => d.u);
         const uclData = data.data.map((d) => d.ucl);
         const lclData = data.data.map((d) => d.lcl);
-        const maxValue = Math.max(...uData, ...uclData, 0.5);
-        const yMax = Math.ceil(maxValue / 0.5) * 0.5;
+        const step = errorId ? 0.25 : 0.5;
+        const maxValue = Math.max(...uData, ...uclData, step);
+        const yMax = Math.ceil(maxValue / step) * step;
         if (container._chart) {
           container._chart.destroy();
         }
@@ -243,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
               y: {
                 min: 0,
                 max: yMax,
-                ticks: { stepSize: 0.5 },
+                ticks: { stepSize: step },
               },
             },
           },
