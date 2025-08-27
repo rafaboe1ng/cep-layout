@@ -382,8 +382,9 @@ body {
   grid-template-rows: 1fr;
 }
 
+
 .chart-item {
-  background: #ffffff;
+  background: #0048aa;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   padding: 18px 18px 10px;
@@ -395,7 +396,7 @@ body {
 .chart-hoje {
   grid-column: 1 / 2;
   grid-row: 1 / 2;
-  background: #ffffff;
+  background: #0048aa;
   border-radius: 0;
   box-shadow: none;
   padding: 0;
@@ -417,7 +418,7 @@ body {
   flex-direction: column;
   align-items: stretch;
   justify-content: stretch;
-  background: #ffffff;
+  background: #0048aa;
   border-radius: 0;
   box-shadow: none;
   padding: 0;

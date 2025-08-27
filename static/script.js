@@ -17,6 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const toDbCell = (name) => name.replace('-', '').replace('UPS0', 'UPS');
 
+  const formatDateTime = (str) => {
+    const d = new Date(str);
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  };
+
   function toggleCustomRange() {
     if (dateSelect.value === 'custom') {
       customRange.style.display = '';
@@ -205,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .then((r) => r.json())
       .then((data) => {
         if (!data.success) return;
-        const labels = data.data.map((d) => d.date);
+        const labels = data.data.map((d) => formatDateTime(d.date));
         const uData = data.data.map((d) => d.u);
         const uclData = data.data.map((d) => d.ucl);
         const lclData = data.data.map((d) => d.lcl);
