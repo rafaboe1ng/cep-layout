@@ -202,7 +202,7 @@ def get_u_chart():
 
     delta_days = (end_date - start_date).days
     if delta_days <= 1:
-        bucket = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(si.ts)/900)*900)"
+        bucket = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(si.ts)/300)*300)"
     elif delta_days <= 3:
         bucket = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(si.ts)/1800)*1800)"
     elif delta_days <= 7:
