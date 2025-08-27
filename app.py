@@ -201,10 +201,10 @@ def get_u_chart():
         params['error_cod'] = error_cod
 
     delta_days = (end_date - start_date).days
-    if delta_days <= 1:
+    if delta_days <= 3:
         bucket = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(si.ts)/1800)*1800)"
     elif delta_days <= 7:
-        bucket = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(si.ts)/14400)*14400)"
+        bucket = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(si.ts)/7200)*7200)"
     elif delta_days > 92:
         bucket = "DATE_ADD(:start, INTERVAL FLOOR(DATEDIFF(DATE(si.ts), :start)/14)*14 DAY)"
     else:
