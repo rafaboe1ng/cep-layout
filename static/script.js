@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         break;
       case 'currentYear':
         start = new Date(today.getFullYear(), 0, 1);
-        end = today;
+        end = new Date(today.getFullYear(), 11, 31);
         break;
       case 'previousYear':
         start = new Date(today.getFullYear() - 1, 0, 1);
