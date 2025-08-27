@@ -276,7 +276,7 @@ def get_u_chart():
         ucl = u_bar + 3 * sigma
         lcl = max(0.0, u_bar - 3 * sigma)
         data.append({
-            'date': dt.isoformat(),
+            'date': dt if isinstance(dt, str) else dt.isoformat(),
             'u': round(u, 4),
             'ucl': round(ucl, 4),
             'lcl': round(lcl, 4),
