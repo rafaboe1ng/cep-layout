@@ -164,6 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Enable full-height fill behavior scoped to this grid
     selectedContainer.classList.add('fill-grid');
+    selectedContainer.style.minHeight = '0';
+    selectedContainer.style.height = '100%';
 
     // Layout rules:
     // - 1: ocupa toda a área entre header/footer e sidebar
@@ -172,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (count === 1) {
       selectedContainer.style.gridTemplateColumns = '1fr';
-      selectedContainer.style.gridTemplateRows = '1fr';
+      selectedContainer.style.gridTemplateRows = 'minmax(0, 1fr)';
       selectedContainer.style.gridAutoRows = '';
       // First item fills all columns (only one column anyway)
       items[0].style.gridColumn = '1 / -1';
@@ -183,28 +185,41 @@ document.addEventListener('DOMContentLoaded', () => {
     if (count === 2) {
       // 1 coluna, 2 linhas iguais
       selectedContainer.style.gridTemplateColumns = '1fr';
-      selectedContainer.style.gridTemplateRows = '1fr 1fr';
+      selectedContainer.style.gridTemplateRows = 'repeat(2, minmax(0, 1fr))';
       selectedContainer.style.gridAutoRows = '';
-      items.forEach((it) => (it.style.height = '100%'));
+      items.forEach((it, idx) => {
+        it.style.height = '100%';
+        it.style.gridColumn = '1 / span 1';
+        it.style.gridRow = idx === 0 ? '1' : '2';
+      });
       return;
     }
 
     if (count === 3) {
       // 2 colunas; 1ª linha: item 1 ocupa 2 colunas; 2ª linha: 2 itens
       selectedContainer.style.gridTemplateColumns = '1fr 1fr';
-      selectedContainer.style.gridTemplateRows = '1fr 1fr';
+      selectedContainer.style.gridTemplateRows = 'repeat(2, minmax(0, 1fr))';
       selectedContainer.style.gridAutoRows = '';
-      items[0].style.gridColumn = '1 / span 2';
       items.forEach((it) => (it.style.height = '100%'));
+      items[0].style.gridColumn = '1 / span 2';
+      items[0].style.gridRow = '1';
+      if (items[1]) { items[1].style.gridColumn = '1'; items[1].style.gridRow = '2'; }
+      if (items[2]) { items[2].style.gridColumn = '2'; items[2].style.gridRow = '2'; }
       return;
     }
 
     if (count === 4) {
       // 2 x 2, linhas com alturas iguais
       selectedContainer.style.gridTemplateColumns = '1fr 1fr';
-      selectedContainer.style.gridTemplateRows = '1fr 1fr';
+      selectedContainer.style.gridTemplateRows = 'repeat(2, minmax(0, 1fr))';
       selectedContainer.style.gridAutoRows = '';
-      items.forEach((it) => (it.style.height = '100%'));
+      items.forEach((it, idx) => {
+        it.style.height = '100%';
+        const col = (idx % 2) + 1; // 1..2
+        const row = idx < 2 ? 1 : 2;
+        it.style.gridColumn = String(col);
+        it.style.gridRow = String(row);
+      });
       return;
     }
 
@@ -212,18 +227,45 @@ document.addEventListener('DOMContentLoaded', () => {
     // Par: k = n/2 colunas e 2 linhas iguais
     // Ímpar: colunas = ceil((n+1)/2); item[0] ocupa 2 colunas na primeira linha
     if (count % 2 === 0) {
+      // Par > 4: 2 linhas, n/2 colunas
       const cols = count / 2;
       selectedContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-      selectedContainer.style.gridTemplateRows = '1fr 1fr';
+      selectedContainer.style.gridTemplateRows = 'repeat(2, minmax(0, 1fr))';
       selectedContainer.style.gridAutoRows = '';
-      items.forEach((it) => (it.style.height = '100%'));
+      items.forEach((it, idx) => {
+        it.style.height = '100%';
+        const col = (idx % cols) + 1;
+        const row = idx < cols ? 1 : 2;
+        it.style.gridColumn = String(col);
+        it.style.gridRow = String(row);
+      });
     } else {
+      // Ímpar >= 5: 2 linhas, ceil((n+1)/2) colunas; primeiro ocupa 2 colunas na linha 1
       const cols = Math.ceil((count + 1) / 2);
       selectedContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-      selectedContainer.style.gridTemplateRows = '1fr 1fr';
+      selectedContainer.style.gridTemplateRows = 'repeat(2, minmax(0, 1fr))';
       selectedContainer.style.gridAutoRows = '';
-      items[0].style.gridColumn = '1 / span 2';
       items.forEach((it) => (it.style.height = '100%'));
+      // Primeiro ocupa 2 colunas na primeira linha
+      items[0].style.gridColumn = '1 / span 2';
+      items[0].style.gridRow = '1';
+      // Quantos slots restam na linha de cima além do primeiro (que usa 2 colunas)?
+      const topSlots = Math.max(0, cols - 2);
+      // Preenche a linha de cima a partir da 3ª coluna
+      for (let i = 0; i < topSlots; i++) {
+        const idx = 1 + i;
+        if (!items[idx]) break;
+        items[idx].style.gridColumn = String(3 + i);
+        items[idx].style.gridRow = '1';
+      }
+      // Restante vai para a 2ª linha, colunas de 1..cols
+      let next = 1 + topSlots;
+      for (let c = 1; c <= cols; c++) {
+        if (!items[next]) break;
+        items[next].style.gridColumn = String(c);
+        items[next].style.gridRow = '2';
+        next++;
+      }
     }
   }
 
