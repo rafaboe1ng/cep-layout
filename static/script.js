@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const selectedCells = new Map();
   const lastUpdateEl = document.getElementById('lastUpdate');
   const updateNowBtn = document.getElementById('updateNowBtn');
+  let refreshIntervalId;
 
   const toDbCell = (name) => name.replace('-', '').replace('UPS0', 'UPS');
 
@@ -122,10 +123,19 @@ document.addEventListener('DOMContentLoaded', () => {
     dateSelect.addEventListener('change', () => {
       toggleCustomRange();
       refreshAndUpdate();
+      scheduleRefreshInterval();
     });
   }
-  if (startDateInput) startDateInput.addEventListener('change', refreshAndUpdate);
-  if (endDateInput) endDateInput.addEventListener('change', refreshAndUpdate);
+  if (startDateInput)
+    startDateInput.addEventListener('change', () => {
+      refreshAndUpdate();
+      scheduleRefreshInterval();
+    });
+  if (endDateInput)
+    endDateInput.addEventListener('change', () => {
+      refreshAndUpdate();
+      scheduleRefreshInterval();
+    });
 
   // Atualiza gráficos conforme defeitos selecionados
   const defectSelect = document.getElementById('defectFilter');
@@ -500,6 +510,16 @@ document.addEventListener('DOMContentLoaded', () => {
     return refreshAll().then(updateLastUpdate);
   }
 
+  function scheduleRefreshInterval() {
+    if (refreshIntervalId) clearInterval(refreshIntervalId);
+    const { start, end } = getDateRange();
+    const startTime = new Date(start);
+    const endTime = new Date(end);
+    const oneDayMs = 24 * 60 * 60 * 1000;
+    const interval = endTime - startTime <= oneDayMs ? 15 * 60 * 1000 : 5 * 60 * 1000;
+    refreshIntervalId = setInterval(refreshAndUpdate, interval);
+  }
+
   if (defectSelect) {
     fetch('/get_errors')
       .then((r) => r.json())
@@ -682,8 +702,12 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCellSidebarVisibility();
   }
 
-  if (updateNowBtn) updateNowBtn.addEventListener('click', refreshAndUpdate);
+  if (updateNowBtn)
+    updateNowBtn.addEventListener('click', () => {
+      refreshAndUpdate();
+      scheduleRefreshInterval();
+    });
 
   refreshAndUpdate();
-  setInterval(refreshAndUpdate, 5 * 60 * 1000);
+  scheduleRefreshInterval();
 });
