@@ -147,21 +147,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const items = Array.from(selectedContainer.querySelectorAll('.chart-item'));
     const count = items.length;
 
-    // Reset manual positioning from previous layouts
+    // Clear any manual positioning from a previous layout
     items.forEach((item) => {
       item.style.gridRow = '';
       item.style.gridColumn = '';
     });
 
-    if (count === 0) return;
-
-    // Allow CSS to handle column distribution
-    selectedContainer.style.gridTemplateColumns = '';
-
-    // If we have an odd number of charts, make the first span two columns
-    if (count % 2 === 1 && count > 1) {
-      items[0].style.gridColumn = 'span 2';
+    if (count === 0) {
+      selectedContainer.style.gridTemplateColumns = '';
+      selectedContainer.style.gridAutoRows = '';
+      return;
     }
+
+    // Use at most two rows and let CSS Grid handle item placement
+    const cols = Math.ceil(count / 2);
+    selectedContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    selectedContainer.style.gridAutoRows = 'auto';
   }
 
   function buildParams(extra = {}) {
