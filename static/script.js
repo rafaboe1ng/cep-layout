@@ -257,8 +257,12 @@ document.addEventListener('DOMContentLoaded', () => {
               y: {
                 min: 0,
                 max: yMax,
+                grid: {
+                  drawBorder: false,
+                },
                 ticks: {
                   stepSize: step,
+                  precision: 2,
                   callback: (value) => Number(value).toFixed(2),
                 },
               },
