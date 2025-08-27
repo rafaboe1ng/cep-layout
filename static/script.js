@@ -147,47 +147,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const items = Array.from(selectedContainer.querySelectorAll('.chart-item'));
     const count = items.length;
 
+    // Clear any manual positioning from a previous layout
+    items.forEach((item) => {
+      item.style.gridRow = '';
+      item.style.gridColumn = '';
+    });
+
     if (count === 0) {
       selectedContainer.style.gridTemplateColumns = '';
-      selectedContainer.style.gridTemplateRows = '';
+      selectedContainer.style.gridAutoRows = '';
       return;
     }
 
-    let top, bottom;
-    if (count % 2 === 0) {
-      top = bottom = count / 2;
-    } else if (count >= 3) {
-      top = Math.floor(count / 2);
-      bottom = count - top;
-    } else {
-      top = count;
-      bottom = 0;
-    }
-
-    const cols = Math.max(top, bottom);
+    // Use at most two rows and let CSS Grid handle item placement
+    const cols = Math.ceil(count / 2);
     selectedContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-    selectedContainer.style.gridTemplateRows = bottom > 0 ? '1fr 1fr' : '1fr';
-
-    const placeRow = (startIdx, n, row) => {
-      if (n === 0) return;
-      const baseSpan = Math.floor(cols / n) || 1;
-      let leftover = cols - baseSpan * n;
-      let colStart = 1;
-      for (let i = 0; i < n; i++) {
-        const item = items[startIdx + i];
-        let span = baseSpan;
-        if (leftover > 0) {
-          span += 1;
-          leftover -= 1;
-        }
-        item.style.gridRow = String(row);
-        item.style.gridColumn = `${colStart} / span ${span}`;
-        colStart += span;
-      }
-    };
-
-    placeRow(0, top, 1);
-    placeRow(top, bottom, 2);
+    selectedContainer.style.gridAutoRows = 'auto';
   }
 
   function buildParams(extra = {}) {

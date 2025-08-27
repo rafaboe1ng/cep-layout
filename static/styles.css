@@ -451,10 +451,11 @@ body {
   width: 100%;
   flex: 1;
   overflow-y: auto;
+  align-content: start;
 }
 
 .selected-defects-grid .chart-item {
-  height: 100%;
+  height: auto;
 }
 
 .selected-defect {
