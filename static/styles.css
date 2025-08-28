@@ -16,6 +16,19 @@
   display: flex;
 }
 
+@keyframes blink-red {
+  0%, 100% {
+    border-color: red;
+  }
+  50% {
+    border-color: #0048aa;
+  }
+}
+
+.grafico-grid.blink-red {
+  animation: blink-red 1s steps(2, start) infinite;
+}
+
 .grafico-box {
   background: #223044;
   border: 3px solid #1a2533;
@@ -511,6 +524,18 @@ body {
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 1px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.chart-title .defect-count {
+  font-weight: bold;
+}
+
+.chart-title .defect-angle {
+  font-weight: normal;
 }
 
 .chart-img {
@@ -683,6 +708,16 @@ body {
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 0.9rem;
+}
+
+.sidebar-selected-defect .defect-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sidebar-selected-defect .defect-count {
+  font-weight: bold;
 }
 
 .sidebar-selected-defect .remove-defect-btn {

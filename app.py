@@ -2,6 +2,7 @@ from flask import Flask, render_template, jsonify, redirect, url_for, request
 from sqlalchemy import create_engine, text
 from datetime import datetime, timedelta, date
 import os
+import math
 
 app = Flask(__name__)
 
@@ -270,13 +271,16 @@ def get_u_chart():
     dates = sorted(set(insp_map) | set(defect_map))
 
     data = []
-    for dt in dates:
+    wls_points = []
+    for idx, dt in enumerate(dates, start=1):
         insp = insp_map.get(dt, 0) or 0
         defects = defect_map.get(dt, 0) or 0
         u = defects / insp if insp else 0.0
         sigma = (u_bar / insp) ** 0.5 if insp else 0.0
         ucl = u_bar + 3 * sigma
         lcl = max(0.0, u_bar - 3 * sigma)
+        if sigma and abs((u - u_bar) / sigma) < 3 and insp > 0:
+            wls_points.append((idx, u, insp))
         data.append({
             'date': dt if isinstance(dt, str) else dt.isoformat(),
             'u': round(u, 4),
@@ -286,7 +290,29 @@ def get_u_chart():
             'total_defects': defects,
         })
 
-    return jsonify({'success': True, 'u_bar': round(u_bar, 4), 'data': data})
+    slope = 0.0
+    intercept = u_bar
+    if len(wls_points) >= 2:
+        sw = sum(w for _, _, w in wls_points)
+        sx = sum(x * w for x, _, w in wls_points)
+        sy = sum(y * w for _, y, w in wls_points)
+        sxx = sum(x * x * w for x, _, w in wls_points)
+        sxy = sum(x * y * w for x, y, w in wls_points)
+        den = sw * sxx - sx * sx
+        if den != 0:
+            slope = (sw * sxy - sx * sy) / den
+            intercept = (sy - slope * sx) / sw
+        else:
+            intercept = sy / sw if sw else u_bar
+
+    for idx, item in enumerate(data, start=1):
+        item['trend'] = round(intercept + slope * idx, 4)
+
+    angle = math.degrees(math.atan(slope))
+
+    return jsonify(
+        {'success': True, 'u_bar': round(u_bar, 4), 'angle': round(angle, 2), 'data': data}
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)
