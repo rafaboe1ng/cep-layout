@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const opts = { timeZone: 'America/Sao_Paulo', hour12: false };
     const datePart = date.toLocaleDateString('pt-BR', opts);
     const timePart = date.toLocaleTimeString('pt-BR', opts);
-    return (timePart === '00:00:00' || timePart === '21:00:00') ? datePart : `${datePart} ${timePart}`;
+    return (timePart === '21:00:00') ? datePart : `${datePart} ${timePart}`;
   };
 
   function toggleCustomRange() {
