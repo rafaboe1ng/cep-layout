@@ -296,7 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const angle = data.angle;
         const labels = data.data.map((d) => formatDateTime(d.date));
         const uData = data.data.map((d) => d.u);
-        const trendData = data.data.map((d) => d.trend);
+        const trendData = errorId ? [] : data.data.map((d) => d.trend);
         const uclData = data.data.map((d) => d.ucl);
         const lclData = data.data.map((d) => d.lcl);
         const latest = data.data[data.data.length - 1];
@@ -310,18 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
           container.classList.remove('blink-red');
         }
 
-        if (errorId) {
-          const chartItem = container.closest('.chart-item');
-          if (chartItem) {
-            const angleSpan = chartItem.querySelector('.defect-angle');
-            if (angleSpan) angleSpan.textContent = `(${angle.toFixed(1)}°)`;
-          }
-          const selected = selectedDefects.get(String(errorId));
-          if (selected) {
-            const sideAngle = selected.item.querySelector('.defect-angle');
-            if (sideAngle) sideAngle.textContent = `(${angle.toFixed(1)}°)`;
-          }
-        } else {
+        if (!errorId) {
           const mainItem = container.closest('.chart-item');
           if (mainItem) {
             const title = mainItem.querySelector('.chart-title');
@@ -329,7 +318,9 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
         const step = errorId ? 0.25 : 0.5;
-        const maxValue = Math.max(...uData, ...uclData, ...trendData, step);
+        const maxValue = errorId
+          ? Math.max(...uData, ...uclData, step)
+          : Math.max(...uData, ...uclData, ...trendData, step);
         const yMax = Number((Math.ceil(maxValue / step) * step).toFixed(2));
         if (container._chart) {
           container._chart.destroy();
@@ -342,14 +333,19 @@ document.addEventListener('DOMContentLoaded', () => {
           type: 'line',
           data: {
             labels,
-              datasets: [
+            datasets: (() => {
+              const ds = [
                 { label: 'u', data: uData, borderColor: 'blue', fill: false },
-                {
+              ];
+              if (!errorId) {
+                ds.push({
                   label: 'Tendência',
                   data: trendData,
-                  borderColor: 'orange',
+                  borderColor: 'skyblue',
                   fill: false,
-                },
+                });
+              }
+              ds.push(
                 {
                   label: 'UCL',
                   data: uclData,
@@ -363,8 +359,10 @@ document.addEventListener('DOMContentLoaded', () => {
                   borderColor: 'green',
                   borderDash: [5, 5],
                   fill: false,
-                },
-              ],
+                }
+              );
+              return ds;
+            })(),
           },
           options: {
             responsive: true,
@@ -404,9 +402,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const defect = data.defects[i];
             if (title) {
               if (defect) {
-                title.innerHTML = `<span class="defect-count">${defect.total}</span> <span class="defect-name">${defect.id} - ${defect.name}</span> <span class="defect-angle"></span>`;
+                title.innerHTML = `<span class="defect-name">${defect.id} - ${defect.name}</span> <span class="defect-count">(${defect.total})</span>`;
               } else {
-                title.innerHTML = '<span class="defect-count">0</span> <span class="defect-name">-</span> <span class="defect-angle"></span>';
+                title.innerHTML = '<span class="defect-name">-</span> <span class="defect-count">(0)</span>';
               }
             }
             if (grid) {
@@ -452,7 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
               const title = document.createElement('h4');
               title.className = 'chart-title';
-              title.innerHTML = `<span class="defect-count">${def.total}</span> <span class="defect-name">${def.id} - ${def.name}</span> <span class="defect-angle"></span>`;
+              title.innerHTML = `<span class="defect-name">${def.id} - ${def.name}</span> <span class="defect-count">(${def.total})</span>`;
               box.appendChild(title);
 
               const grid = document.createElement('div');
@@ -491,9 +489,9 @@ document.addEventListener('DOMContentLoaded', () => {
           selectedDefects.forEach(({ box, item }, id) => {
             const count = totals.get(String(id)) || 0;
             const titleCount = box.querySelector('.defect-count');
-            if (titleCount) titleCount.textContent = count;
+            if (titleCount) titleCount.textContent = `(${count})`;
             const sideCount = item.querySelector('.defect-count');
-            if (sideCount) sideCount.textContent = count;
+            if (sideCount) sideCount.textContent = `(${count})`;
           });
         }
       });
@@ -595,7 +593,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           const title = document.createElement('h4');
           title.className = 'chart-title';
-          title.innerHTML = `<span class="defect-count">0</span> <span class="defect-name">${id} - ${name}</span> <span class="defect-angle"></span>`;
+          title.innerHTML = `<span class="defect-name">${id} - ${name}</span> <span class="defect-count">(0)</span>`;
           box.appendChild(title);
 
           const grid = document.createElement('div');
@@ -613,15 +611,12 @@ document.addEventListener('DOMContentLoaded', () => {
           info.className = 'defect-info';
           const countSpan = document.createElement('span');
           countSpan.className = 'defect-count';
-          countSpan.textContent = '0';
+          countSpan.textContent = '(0)';
           const nameSpan = document.createElement('span');
           nameSpan.className = 'defect-name';
           nameSpan.textContent = `${id} - ${name}`;
-          const angleSpan = document.createElement('span');
-          angleSpan.className = 'defect-angle';
-          info.appendChild(countSpan);
           info.appendChild(nameSpan);
-          info.appendChild(angleSpan);
+          info.appendChild(countSpan);
           item.appendChild(info);
           const removeBtn = document.createElement('button');
           removeBtn.className = 'remove-defect-btn';

@@ -534,10 +534,6 @@ body {
   font-weight: bold;
 }
 
-.chart-title .defect-angle {
-  font-weight: normal;
-}
-
 .chart-img {
   width: 100%;
   max-width: 360px;

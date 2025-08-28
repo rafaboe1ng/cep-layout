@@ -292,7 +292,7 @@ def get_u_chart():
 
     slope = 0.0
     intercept = u_bar
-    if len(wls_points) >= 2:
+    if not error_cod and len(wls_points) >= 2:
         sw = sum(w for _, _, w in wls_points)
         sx = sum(x * w for x, _, w in wls_points)
         sy = sum(y * w for _, y, w in wls_points)
@@ -305,13 +305,19 @@ def get_u_chart():
         else:
             intercept = sy / sw if sw else u_bar
 
-    for idx, item in enumerate(data, start=1):
-        item['trend'] = round(intercept + slope * idx, 4)
-
-    angle = math.degrees(math.atan(slope))
+    angle = 0.0
+    if not error_cod:
+        for idx, item in enumerate(data, start=1):
+            item['trend'] = round(intercept + slope * idx, 4)
+        angle = math.degrees(math.atan(slope))
 
     return jsonify(
-        {'success': True, 'u_bar': round(u_bar, 4), 'angle': round(angle, 2), 'data': data}
+        {
+            'success': True,
+            'u_bar': round(u_bar, 4),
+            'angle': round(angle, 2) if not error_cod else None,
+            'data': data,
+        }
     )
 
 if __name__ == '__main__':
