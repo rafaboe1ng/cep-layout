@@ -300,8 +300,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const uclData = data.data.map((d) => d.ucl);
         const lclData = data.data.map((d) => d.lcl);
         const latest = data.data[data.data.length - 1];
-        const prevDate = container.dataset.lastDate;
+        const key = errorId ? `lastDate_${errorId}` : 'lastDate_main';
+        const prevDate =
+          container.dataset.lastDate || localStorage.getItem(key);
         container.dataset.lastDate = latest.date;
+        localStorage.setItem(key, latest.date);
         const isNewPoint = prevDate !== latest.date;
         const outOfControl = latest.u > latest.ucl || latest.u < latest.lcl;
         if (isNewPoint && outOfControl) {
@@ -731,6 +734,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (updateNowBtn) updateNowBtn.addEventListener('click', refreshAndUpdate);
 
-  refreshAndUpdate();
+  if (defectQuantityOk) {
+    defectQuantityOk.click();
+  } else {
+    refreshAndUpdate();
+  }
   setInterval(refreshAndUpdate, 5 * 60 * 1000);
 });
