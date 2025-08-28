@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 {
                   label: 'LCL',
                   data: lclData,
-                  borderColor: 'green',
+                  borderColor: 'yellow',
                   borderDash: [5, 5],
                   fill: false,
                 }
