@@ -203,17 +203,15 @@ def get_u_chart():
 
     delta_days = (end_date - start_date).days
     if delta_days <= 1:
-        bucket = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(si.ts)/300)*300)"
+        bucket = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(si.ts)/300)*300)"  # 5 min
     elif delta_days <= 3:
-        bucket = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(si.ts)/1800)*1800)"
+        bucket = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(si.ts)/1800)*1800)"  # 30 min
     elif delta_days <= 7:
-        bucket = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(si.ts)/7200)*7200)"
-    elif delta_days > 92:
-        bucket = (
-            "DATE_ADD(:start, INTERVAL FLOOR(DATEDIFF(DATE(si.ts), :start)/14)*14 DAY)"
-        )
+        bucket = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(si.ts)/3600)*3600)"  # 1 hour
+    elif delta_days <= 30:
+        bucket = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(si.ts)/10800)*10800)"  # 3 hours
     else:
-        bucket = "DATE(si.ts)"
+        bucket = "DATE(si.ts)"  # 1 day
 
     baseline_insp_query = f"""
         SELECT COUNT(DISTINCT si.id) AS total

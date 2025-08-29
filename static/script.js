@@ -17,13 +17,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const toDbCell = (name) => name.replace('-', '').replace('UPS0', 'UPS');
 
-  const formatDateTime = (str) => {
-    if (!str) return '';
-    const date = new Date(str.endsWith('Z') ? str : str + 'Z');
-    const opts = { timeZone: 'America/Sao_Paulo', hour12: false };
-    const datePart = date.toLocaleDateString('pt-BR', opts);
-    const timePart = date.toLocaleTimeString('pt-BR', opts);
-    return (timePart === '21:00:00') ? datePart : `${datePart} ${timePart}`;
+  const parseLocalDate = (str) => {
+    const [y, m, d] = str.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  };
+
+  const parseLocalDateTime = (str) => {
+    if (!str) return new Date();
+    const [datePart, timePart = ''] = str.split('T');
+    const [y, m, d] = datePart.split('-').map(Number);
+    const [h = 0, mi = 0, s = 0] = timePart.split(':').map(Number);
+    return new Date(y, m - 1, d, h, mi, s);
+  };
+
+  const formatDateTime = (input) => {
+    const date =
+      input instanceof Date
+        ? input
+        : typeof input === 'number'
+        ? new Date(input)
+        : parseLocalDateTime(input);
+    const datePart = date.toLocaleDateString('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      day: '2-digit',
+      month: '2-digit',
+    });
+    const timePart = date.toLocaleTimeString('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    return timePart === '00:00' ? datePart : `${datePart} ${timePart}`;
   };
 
   function toggleCustomRange() {
@@ -92,8 +117,8 @@ document.addEventListener('DOMContentLoaded', () => {
         end = new Date(today.getFullYear() - 1, 11, 31);
         break;
       case 'custom':
-        start = startDateInput.value ? new Date(startDateInput.value) : today;
-        end = endDateInput.value ? new Date(endDateInput.value) : today;
+        start = startDateInput.value ? parseLocalDate(startDateInput.value) : today;
+        end = endDateInput.value ? parseLocalDate(endDateInput.value) : today;
         break;
       default:
         start = end = today;
@@ -275,12 +300,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function buildParams(extra = {}) {
     const { start, end } = getDateRange();
     const paramsObj = { start, end, ...extra };
-    if (
-      dateSelect &&
-      (dateSelect.value === 'currentYear' || dateSelect.value === 'previousYear')
-    ) {
-      paramsObj.bucket = 'biweekly';
-    }
     const params = new URLSearchParams(paramsObj);
     selectedCells.forEach((_, cell) => params.append('cell', cell));
     return params;
@@ -294,19 +313,51 @@ document.addEventListener('DOMContentLoaded', () => {
       .then((data) => {
         if (!data.success) return;
         const angle = data.angle;
-        const labels = data.data.map((d) => formatDateTime(d.date));
-        const uData = data.data.map((d) => d.u);
-        const trendData = errorId ? [] : data.data.map((d) => d.trend);
-        const uclData = data.data.map((d) => d.ucl);
-        const lclData = data.data.map((d) => d.lcl);
-        const latest = data.data[data.data.length - 1];
+        const points = data.data
+          .filter((d) => d.total_inspections > 0)
+          .map((d) => ({
+            x: parseLocalDateTime(d.date),
+            u: d.u,
+            trend: d.trend,
+            ucl: d.ucl,
+            lcl: d.lcl,
+          }));
+        const firstDate = points[0]?.x;
+        const lastDate = points[points.length - 1]?.x;
+        const uData = points.map((p) => ({ x: p.x, y: p.u }));
+        const trendData = errorId ? [] : points.map((p) => ({ x: p.x, y: p.trend }));
+        const uclData = points.map((p) => ({ x: p.x, y: p.ucl }));
+        const lclData = points.map((p) => ({ x: p.x, y: p.lcl }));
+        const diffDays = firstDate && lastDate ? (lastDate - firstDate) / 86400000 : 0;
+        let unit = 'day';
+        let stepSize = 1;
+        if (diffDays <= 1) {
+          unit = 'minute';
+          stepSize = 5;
+        } else if (diffDays <= 3) {
+          unit = 'minute';
+          stepSize = 30;
+        } else if (diffDays <= 7) {
+          unit = 'hour';
+          stepSize = 1;
+        } else if (diffDays <= 30) {
+          unit = 'hour';
+          stepSize = 3;
+        }
+        const width = container.clientWidth || 300;
+        const approx = unit === 'day' ? 60 : 90;
+        let maxTicks = Math.max(2, Math.floor(width / approx));
+        const baseMax = unit === 'day' ? 6 : unit === 'hour' ? 8 : 10;
+        if (maxTicks > baseMax) maxTicks = baseMax;
+        const latest = points[points.length - 1];
         const key = errorId ? `lastDate_${errorId}` : 'lastDate_main';
-        const prevDate =
-          container.dataset.lastDate || localStorage.getItem(key);
-        container.dataset.lastDate = latest.date;
-        localStorage.setItem(key, latest.date);
-        const isNewPoint = prevDate !== latest.date;
-        const outOfControl = latest.u > latest.ucl || latest.u < latest.lcl;
+        const prevDate = container.dataset.lastDate || localStorage.getItem(key);
+        const latestIso = latest ? latest.x.toISOString() : '';
+        container.dataset.lastDate = latestIso;
+        localStorage.setItem(key, latestIso);
+        const isNewPoint = prevDate !== latestIso;
+        const outOfControl =
+          latest && (latest.u > latest.ucl || latest.u < latest.lcl);
         if (isNewPoint && outOfControl) {
           container.classList.add('blink-red');
         } else {
@@ -322,8 +373,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const step = errorId ? 0.25 : 0.5;
         const maxValue = errorId
-          ? Math.max(...uData, ...uclData, step)
-          : Math.max(...uData, ...uclData, ...trendData, step);
+          ? Math.max(
+              ...uData.map((p) => p.y),
+              ...uclData.map((p) => p.y),
+              step
+            )
+          : Math.max(
+              ...uData.map((p) => p.y),
+              ...uclData.map((p) => p.y),
+              ...trendData.map((p) => p.y),
+              step
+            );
         const yMax = Number((Math.ceil(maxValue / step) * step).toFixed(2));
         if (container._chart) {
           container._chart.destroy();
@@ -335,10 +395,15 @@ document.addEventListener('DOMContentLoaded', () => {
         container._chart = new Chart(canvas.getContext('2d'), {
           type: 'line',
           data: {
-            labels,
             datasets: (() => {
               const ds = [
-                { label: 'u', data: uData, borderColor: 'blue', fill: false },
+                {
+                  label: 'u',
+                  data: uData,
+                  borderColor: 'blue',
+                  fill: false,
+                  spanGaps: true,
+                },
               ];
               if (!errorId) {
                 ds.push({
@@ -346,6 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   data: trendData,
                   borderColor: 'skyblue',
                   fill: false,
+                  spanGaps: true,
                 });
               }
               ds.push(
@@ -355,6 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   borderColor: 'red',
                   borderDash: [5, 5],
                   fill: false,
+                  spanGaps: true,
                 },
                 {
                   label: 'LCL',
@@ -362,6 +429,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   borderColor: 'yellow',
                   borderDash: [5, 5],
                   fill: false,
+                  spanGaps: true,
                 }
               );
               return ds;
@@ -372,7 +440,34 @@ document.addEventListener('DOMContentLoaded', () => {
             maintainAspectRatio: false,
             scales: {
               x: {
-                offset: true,
+                type: 'time',
+                distribution: 'series',
+                time: {
+                  unit,
+                  stepSize,
+                  displayFormats: {
+                    minute: 'dd/MM HH:mm',
+                    hour: 'dd/MM HH:mm',
+                    day: 'dd/MM',
+                  },
+                },
+                ticks: {
+                  source: 'data',
+                  maxRotation: 0,
+                  autoSkip: true,
+                  autoSkipPadding: 40,
+                  maxTicksLimit: maxTicks,
+                  callback: (value) => {
+                    if (unit === 'day') {
+                      return new Date(value).toLocaleDateString('pt-BR', {
+                        timeZone: 'America/Sao_Paulo',
+                        day: '2-digit',
+                        month: '2-digit',
+                      });
+                    }
+                    return formatDateTime(value).replace(' ', '\n');
+                  },
+                },
               },
               y: {
                 min: 0,
@@ -384,6 +479,13 @@ document.addEventListener('DOMContentLoaded', () => {
                   stepSize: step,
                   precision: 2,
                   callback: (value) => Number(value).toFixed(2),
+                },
+              },
+            },
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  title: (ctx) => formatDateTime(ctx[0].parsed.x),
                 },
               },
             },
@@ -532,9 +634,18 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateLastUpdate() {
     if (!lastUpdateEl) return;
     const now = new Date();
-    const opts = { timeZone: 'America/Sao_Paulo', hour12: false };
-    const date = now.toLocaleDateString('pt-BR', opts);
-    const time = now.toLocaleTimeString('pt-BR', opts);
+    const date = now.toLocaleDateString('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+    const time = now.toLocaleTimeString('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
     lastUpdateEl.textContent = `Última atualização: ${date} ${time}`;
   }
 
