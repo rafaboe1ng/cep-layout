@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const toDbCell = (name) => name.replace('-', '').replace('UPS0', 'UPS');
 
+  const formatDefectId = (id) => String(id).padStart(4, '0');
+
   const parseLocalDate = (str) => {
     const [y, m, d] = str.split('-').map(Number);
     return new Date(y, m - 1, d);
@@ -507,7 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const defect = data.defects[i];
             if (title) {
               if (defect) {
-                title.innerHTML = `<span class="defect-name">${defect.id} - ${defect.name}</span> <span class="defect-count">(${defect.total})</span>`;
+                title.innerHTML = `<span class="defect-name">${formatDefectId(defect.id)} - ${defect.name}</span> <span class="defect-count">(${defect.total})</span>`;
               } else {
                 title.innerHTML = '<span class="defect-name">-</span> <span class="defect-count">(0)</span>';
               }
@@ -555,7 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
               const title = document.createElement('h4');
               title.className = 'chart-title';
-              title.innerHTML = `<span class="defect-name">${def.id} - ${def.name}</span> <span class="defect-count">(${def.total})</span>`;
+              title.innerHTML = `<span class="defect-name">${formatDefectId(def.id)} - ${def.name}</span> <span class="defect-count">(${def.total})</span>`;
               box.appendChild(title);
 
               const grid = document.createElement('div');
@@ -660,8 +662,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.success) {
           data.errors.forEach((err) => {
             const option = document.createElement('option');
-            const text = `${err.id} - ${err.name}`;
-            option.value = text;
+            const text = `${formatDefectId(err.id)} - ${err.name}`;
+            option.value = `${err.id} - ${err.name}`;
             option.textContent = text;
             defectSelect.appendChild(option);
           });
@@ -694,20 +696,21 @@ document.addEventListener('DOMContentLoaded', () => {
       const value = defectSelect.value;
       if (value) {
         const [id, name] = value.split(' - ');
-          if (!selectedDefects.has(id)) {
-            if (showingTop) {
-              selectedContainer.querySelectorAll('.grafico-grid').forEach((g) => {
-                if (g._chart) g._chart.destroy();
-              });
-              selectedContainer.innerHTML = '';
-              showingTop = false;
-            }
-            const box = document.createElement('div');
-            box.className = 'chart-item chart-small selected-defect';
+        const paddedId = formatDefectId(id);
+        if (!selectedDefects.has(id)) {
+          if (showingTop) {
+            selectedContainer.querySelectorAll('.grafico-grid').forEach((g) => {
+              if (g._chart) g._chart.destroy();
+            });
+            selectedContainer.innerHTML = '';
+            showingTop = false;
+          }
+          const box = document.createElement('div');
+          box.className = 'chart-item chart-small selected-defect';
 
           const title = document.createElement('h4');
           title.className = 'chart-title';
-          title.innerHTML = `<span class="defect-name">${id} - ${name}</span> <span class="defect-count">(0)</span>`;
+          title.innerHTML = `<span class="defect-name">${paddedId} - ${name}</span> <span class="defect-count">(0)</span>`;
           box.appendChild(title);
 
           const grid = document.createElement('div');
@@ -728,7 +731,7 @@ document.addEventListener('DOMContentLoaded', () => {
           countSpan.textContent = '(0)';
           const nameSpan = document.createElement('span');
           nameSpan.className = 'defect-name';
-          nameSpan.textContent = `${id} - ${name}`;
+          nameSpan.textContent = `${paddedId} - ${name}`;
           info.appendChild(nameSpan);
           info.appendChild(countSpan);
           item.appendChild(info);
