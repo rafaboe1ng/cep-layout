@@ -370,7 +370,13 @@ document.addEventListener('DOMContentLoaded', () => {
           const mainItem = container.closest('.chart-item');
           if (mainItem) {
             const title = mainItem.querySelector('.chart-title');
-            if (title) title.textContent = `DEFEITOS (${angle.toFixed(1)}°)`;
+            if (title) {
+              const angleFormatted = angle.toLocaleString('pt-BR', {
+                minimumFractionDigits: 3,
+                maximumFractionDigits: 3,
+              });
+              title.innerHTML = `DEFEITOS <span class="trend-angle" title="Angulação da linha de Tendência.">(${angleFormatted}°)</span>`;
+            }
           }
         }
         const step = errorId ? 0.25 : 0.5;
@@ -509,9 +515,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const defect = data.defects[i];
             if (title) {
               if (defect) {
-                title.innerHTML = `<span class="defect-name">${formatDefectId(defect.id)} - ${defect.name}</span> <span class="defect-count">(${defect.total})</span>`;
+                title.innerHTML = `<span class="defect-name">${formatDefectId(defect.id)} - ${defect.name}</span> <span class="defect-count" title="Quantidade de Ocorrências.">(${defect.total})</span>`;
               } else {
-                title.innerHTML = '<span class="defect-name">-</span> <span class="defect-count">(0)</span>';
+                title.innerHTML = '<span class="defect-name">-</span> <span class="defect-count" title="Quantidade de Ocorrências.">(0)</span>';
               }
             }
             if (grid) {
@@ -543,7 +549,7 @@ document.addEventListener('DOMContentLoaded', () => {
             box.className = 'chart-item chart-small';
             const title = document.createElement('h4');
             title.className = 'chart-title';
-            title.textContent = 'Nenhum defeito (0)';
+            title.innerHTML = '<span class="defect-name">Nenhum defeito</span> <span class="defect-count" title="Quantidade de Ocorrências.">(0)</span>';
             box.appendChild(title);
             const grid = document.createElement('div');
             grid.className = 'grafico-grid';
@@ -557,7 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
               const title = document.createElement('h4');
               title.className = 'chart-title';
-              title.innerHTML = `<span class="defect-name">${formatDefectId(def.id)} - ${def.name}</span> <span class="defect-count">(${def.total})</span>`;
+              title.innerHTML = `<span class="defect-name">${formatDefectId(def.id)} - ${def.name}</span> <span class="defect-count" title="Quantidade de Ocorrências.">(${def.total})</span>`;
               box.appendChild(title);
 
               const grid = document.createElement('div');
@@ -710,7 +716,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           const title = document.createElement('h4');
           title.className = 'chart-title';
-          title.innerHTML = `<span class="defect-name">${paddedId} - ${name}</span> <span class="defect-count">(0)</span>`;
+          title.innerHTML = `<span class="defect-name">${paddedId} - ${name}</span> <span class="defect-count" title="Quantidade de Ocorrências.">(0)</span>`;
           box.appendChild(title);
 
           const grid = document.createElement('div');
@@ -729,6 +735,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const countSpan = document.createElement('span');
           countSpan.className = 'defect-count';
           countSpan.textContent = '(0)';
+          countSpan.title = 'Quantidade de Ocorrências.';
           const nameSpan = document.createElement('span');
           nameSpan.className = 'defect-name';
           nameSpan.textContent = `${paddedId} - ${name}`;

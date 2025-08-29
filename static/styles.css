@@ -534,6 +534,10 @@ body {
   font-weight: bold;
 }
 
+.chart-title .trend-angle {
+  font-weight: bold;
+}
+
 .chart-img {
   width: 100%;
   max-width: 360px;
