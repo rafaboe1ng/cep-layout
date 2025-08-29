@@ -352,15 +352,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const baseMax = unit === 'day' ? 6 : unit === 'hour' ? 8 : 10;
         if (maxTicks > baseMax) maxTicks = baseMax;
         const latest = points[points.length - 1];
-        const key = errorId ? `lastDate_${errorId}` : 'lastDate_main';
-        const prevDate = container.dataset.lastDate || localStorage.getItem(key);
         const latestIso = latest ? latest.x.toISOString() : '';
         container.dataset.lastDate = latestIso;
-        localStorage.setItem(key, latestIso);
-        const isNewPoint = prevDate !== latestIso;
+        const ackDate = container.dataset.ackDate;
         const outOfControl =
           latest && (latest.u > latest.ucl || latest.u < latest.lcl);
-        if (isNewPoint && outOfControl) {
+        if (outOfControl && latestIso !== ackDate) {
           container.classList.add('blink-red');
         } else {
           container.classList.remove('blink-red');
@@ -853,7 +850,15 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCellSidebarVisibility();
   }
 
-  if (updateNowBtn) updateNowBtn.addEventListener('click', refreshAndUpdate);
+  if (updateNowBtn)
+    updateNowBtn.addEventListener('click', () => {
+      document.querySelectorAll('.grafico-grid').forEach((grid) => {
+        const lastDate = grid.dataset.lastDate || '';
+        grid.dataset.ackDate = lastDate;
+        grid.classList.remove('blink-red');
+      });
+      refreshAndUpdate();
+    });
 
   if (defectQuantityOk) {
     defectQuantityOk.click();

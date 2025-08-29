@@ -27,6 +27,7 @@
 
 .grafico-grid.blink-red {
   animation: blink-red 1s steps(2, start) infinite;
+  border-width: 5px;
 }
 
 .grafico-box {
