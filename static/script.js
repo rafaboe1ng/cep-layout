@@ -852,12 +852,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (updateNowBtn)
     updateNowBtn.addEventListener('click', () => {
-      document.querySelectorAll('.grafico-grid').forEach((grid) => {
-        const lastDate = grid.dataset.lastDate || '';
-        grid.dataset.ackDate = lastDate;
-        grid.classList.remove('blink-red');
+      refreshAndUpdate().then(() => {
+        document.querySelectorAll('.grafico-grid').forEach((grid) => {
+          const lastDate = grid.dataset.lastDate || '';
+          grid.dataset.ackDate = lastDate;
+          grid.classList.remove('blink-red');
+        });
       });
-      refreshAndUpdate();
     });
 
   if (defectQuantityOk) {
