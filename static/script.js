@@ -26,10 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const parseLocalDateTime = (str) => {
     if (!str) return new Date();
-    const [datePart, timePart = ''] = str.split('T');
-    const [y, m, d] = datePart.split('-').map(Number);
-    const [h = 0, mi = 0, s = 0] = timePart.split(':').map(Number);
-    return new Date(y, m - 1, d, h, mi, s);
+    const [datePart, timePart = ""] = str.split("T");
+    const [y, m, d] = datePart.split("-").map(Number);
+    const [h = 0, mi = 0, s = 0] = timePart.split(":").map(Number);
+    return new Date(Date.UTC(y, m - 1, d, h + 3, mi, s));
   };
 
   const formatDateTime = (input) => {
@@ -324,33 +324,14 @@ document.addEventListener('DOMContentLoaded', () => {
             ucl: d.ucl,
             lcl: d.lcl,
           }));
-        const firstDate = points[0]?.x;
-        const lastDate = points[points.length - 1]?.x;
-        const uData = points.map((p) => ({ x: p.x, y: p.u }));
-        const trendData = errorId ? [] : points.map((p) => ({ x: p.x, y: p.trend }));
-        const uclData = points.map((p) => ({ x: p.x, y: p.ucl }));
-        const lclData = points.map((p) => ({ x: p.x, y: p.lcl }));
-        const diffDays = firstDate && lastDate ? (lastDate - firstDate) / 86400000 : 0;
-        let unit = 'day';
-        let stepSize = 1;
-        if (diffDays <= 1) {
-          unit = 'minute';
-          stepSize = 5;
-        } else if (diffDays <= 3) {
-          unit = 'minute';
-          stepSize = 30;
-        } else if (diffDays <= 7) {
-          unit = 'hour';
-          stepSize = 1;
-        } else if (diffDays <= 30) {
-          unit = 'hour';
-          stepSize = 3;
-        }
+        const labels = points.map((p) => formatDateTime(p.x));
+        const uData = points.map((p) => p.u);
+        const trendData = errorId ? [] : points.map((p) => p.trend);
+        const uclData = points.map((p) => p.ucl);
+        const lclData = points.map((p) => p.lcl);
         const width = container.clientWidth || 300;
-        const approx = unit === 'day' ? 60 : 90;
-        let maxTicks = Math.max(2, Math.floor(width / approx));
-        const baseMax = unit === 'day' ? 6 : unit === 'hour' ? 8 : 10;
-        if (maxTicks > baseMax) maxTicks = baseMax;
+        let maxTicks = Math.max(2, Math.floor(width / 60));
+        if (maxTicks > 10) maxTicks = 10;
         const latest = points[points.length - 1];
         const latestIso = latest ? latest.x.toISOString() : '';
         container.dataset.lastDate = latestIso;
@@ -378,17 +359,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const step = errorId ? 0.25 : 0.5;
         const maxValue = errorId
-          ? Math.max(
-              ...uData.map((p) => p.y),
-              ...uclData.map((p) => p.y),
-              step
-            )
-          : Math.max(
-              ...uData.map((p) => p.y),
-              ...uclData.map((p) => p.y),
-              ...trendData.map((p) => p.y),
-              step
-            );
+          ? Math.max(...uData, ...uclData, step)
+          : Math.max(...uData, ...uclData, ...trendData, step);
         const yMax = Number((Math.ceil(maxValue / step) * step).toFixed(2));
         if (container._chart) {
           container._chart.destroy();
@@ -397,44 +369,49 @@ document.addEventListener('DOMContentLoaded', () => {
         const canvas = document.createElement('canvas');
         canvas.style.backgroundColor = '#fff';
         container.appendChild(canvas);
-        container._chart = new Chart(canvas.getContext('2d'), {
-          type: 'line',
+        container._chart = new Chart(canvas.getContext("2d"), {
+          type: "line",
           data: {
+            labels,
             datasets: (() => {
               const ds = [
                 {
-                  label: 'u',
+                  label: "U",
                   data: uData,
-                  borderColor: 'blue',
+                  borderColor: "blue",
                   fill: false,
                   spanGaps: true,
+                  pointStyle: "line",
                 },
               ];
               if (!errorId) {
                 ds.push({
-                  label: 'Tendência',
+                  label: "Tendência",
                   data: trendData,
-                  borderColor: 'skyblue',
+                  borderColor: "skyblue",
                   fill: false,
                   spanGaps: true,
+                  pointStyle: "line",
                 });
               }
               ds.push(
                 {
-                  label: 'UCL',
+                  label: "UCL",
                   data: uclData,
-                  borderColor: 'red',
+                  borderColor: "red",
                   borderDash: [5, 5],
                   fill: false,
                   spanGaps: true,
+                  pointStyle: "line",
                 },
                 {
-                  label: 'LCL',
+                  label: "LCL",
                   data: lclData,
-                  borderColor: 'yellow',
+                  borderColor: "yellow",
                   borderDash: [5, 5],
                   fill: false,
                   spanGaps: true,
+                  pointStyle: "line",
                 }
               );
               return ds;
@@ -445,33 +422,12 @@ document.addEventListener('DOMContentLoaded', () => {
             maintainAspectRatio: false,
             scales: {
               x: {
-                type: 'time',
-                distribution: 'series',
-                time: {
-                  unit,
-                  stepSize,
-                  displayFormats: {
-                    minute: 'dd/MM HH:mm',
-                    hour: 'dd/MM HH:mm',
-                    day: 'dd/MM',
-                  },
-                },
+                type: "category",
                 ticks: {
-                  source: 'data',
                   maxRotation: 0,
                   autoSkip: true,
                   autoSkipPadding: 40,
                   maxTicksLimit: maxTicks,
-                  callback: (value) => {
-                    if (unit === 'day') {
-                      return new Date(value).toLocaleDateString('pt-BR', {
-                        timeZone: 'America/Sao_Paulo',
-                        day: '2-digit',
-                        month: '2-digit',
-                      });
-                    }
-                    return formatDateTime(value).replace(' ', '\n');
-                  },
                 },
               },
               y: {
@@ -487,10 +443,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
               },
             },
+            elements: {
+              point: {
+                radius: 0,
+              },
+            },
             plugins: {
+              legend: {
+                labels: {
+                  usePointStyle: true,
+                },
+              },
               tooltip: {
                 callbacks: {
-                  title: (ctx) => formatDateTime(ctx[0].parsed.x),
+                  title: (ctx) => ctx[0].label,
                 },
               },
             },
