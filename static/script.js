@@ -23,6 +23,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const updateNowBtn = document.getElementById('updateNowBtn');
   const footerCellsEl = document.getElementById('footerCells');
   const footerPeriodEl = document.getElementById('footerPeriod');
+  const generalSwitch = document.getElementById('generalDefectsSwitch');
+  const generalQuantityInput = document.getElementById('generalDefectsQuantity');
+  const generalQuantityOk = document.getElementById('generalDefectsOk');
+  const generalQuantityContainer = document.getElementById('generalQuantityContainer');
+  let generalTopEnabled = true;
+  let generalTopLimit = 6;
 
   const toDbCell = (name) => name.replace('-', '').replace('UPS0', 'UPS');
 
@@ -192,6 +198,30 @@ document.addEventListener('DOMContentLoaded', () => {
   if (startDateInput) startDateInput.addEventListener('change', refreshAndUpdate);
   if (endDateInput) endDateInput.addEventListener('change', refreshAndUpdate);
 
+  function updateGeneralQuantityVisibility() {
+    if (!generalQuantityContainer) return;
+    generalQuantityContainer.style.display = generalSwitch && generalSwitch.checked ? '' : 'none';
+  }
+
+  if (generalSwitch) {
+    updateGeneralQuantityVisibility();
+    generalSwitch.addEventListener('change', () => {
+      generalTopEnabled = generalSwitch.checked;
+      updateGeneralQuantityVisibility();
+      if (!generalTopEnabled) {
+        refreshAndUpdate();
+      }
+    });
+  }
+
+  if (generalQuantityOk) {
+    generalQuantityOk.addEventListener('click', () => {
+      generalTopEnabled = generalSwitch ? generalSwitch.checked : true;
+      generalTopLimit = generalQuantityInput ? parseInt(generalQuantityInput.value) || 6 : 6;
+      refreshAndUpdate();
+    });
+  }
+
   // Atualiza gráficos conforme defeitos selecionados
   const defectSelect = document.getElementById('defectFilter');
   const selectedContainer = document.getElementById('selectedDefectsContainer');
@@ -345,6 +375,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderUChart(container, errorId) {
     if (!container) return Promise.resolve();
     const params = buildParams(errorId ? { error: errorId } : {});
+    if (!errorId && generalTopEnabled) {
+      params.append('top', generalTopLimit);
+    }
     return fetch(`/get_u_chart?${params.toString()}`)
       .then((r) => r.json())
       .then((data) => {
@@ -388,7 +421,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 minimumFractionDigits: 3,
                 maximumFractionDigits: 3,
               });
-              title.innerHTML = `DEFEITOS <span class="trend-angle" title="Angulação da linha de Tendência.">(${angleFormatted}°)</span>`;
+              const baseTitle = generalTopEnabled
+                ? `TOP ${generalTopLimit} DEFEITOS`
+                : 'DEFEITOS GERAIS';
+              title.innerHTML = `${baseTitle} <span class="trend-angle" title="Angulação da linha de Tendência.">(${angleFormatted}°)</span>`;
             }
           }
         }
@@ -870,10 +906,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       });
     });
-
+  if (generalQuantityOk) {
+    generalQuantityOk.click();
+  }
   if (defectQuantityOk) {
     defectQuantityOk.click();
-  } else {
+  } else if (!generalQuantityOk) {
     refreshAndUpdate();
   }
   setInterval(refreshAndUpdate, 5 * 60 * 1000);

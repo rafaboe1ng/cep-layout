@@ -170,6 +170,7 @@ def get_u_chart():
     end = request.args.get('end')
     cells = request.args.getlist('cell')
     error_cod = request.args.get('error')
+    top_n = request.args.get('top', type=int)
     if not start or not end:
         return jsonify({'success': False, 'message': 'Missing date range'}), 400
 
@@ -196,10 +197,7 @@ def get_u_chart():
 
     error_join = ''
     error_filter = ''
-    if error_cod:
-        error_join = ' JOIN error e ON sie.error_id = e.id'
-        error_filter = ' AND e.cod = :error_cod'
-        params['error_cod'] = error_cod
+    top_ids: list[int] = []
 
     delta_days = (end_date - start_date).days
     if delta_days <= 1:
@@ -220,18 +218,6 @@ def get_u_chart():
           AND DATE(si.ts) BETWEEN :b_start AND :b_end
           {cell_filter}
     """
-
-    baseline_defect_query = f"""
-        SELECT COUNT(sie.error_id) AS total
-        FROM sample_inspection si
-        JOIN sample_inspection_error sie ON si.id = sie.sample_inspection_id
-        {error_join}
-        WHERE si.audit = 0
-          AND DATE(si.ts) BETWEEN :b_start AND :b_end
-          {cell_filter}
-          {error_filter}
-    """
-
     daily_insp_query = f"""
         SELECT {bucket} AS date, COUNT(DISTINCT si.id) AS total
         FROM sample_inspection si
@@ -240,21 +226,63 @@ def get_u_chart():
           {cell_filter}
         GROUP BY date
     """
-
-    daily_defect_query = f"""
-        SELECT {bucket} AS date, COUNT(sie.error_id) AS total
-        FROM sample_inspection si
-        JOIN sample_inspection_error sie ON si.id = sie.sample_inspection_id
-        {error_join}
-        WHERE si.audit = 0
-          AND DATE(si.ts) BETWEEN :start AND :end
-          {cell_filter}
-          {error_filter}
-        GROUP BY date
-    """
-
     try:
         with engine.connect() as conn:
+            if top_n and not error_cod:
+                top_query = f"""
+                    SELECT e.cod AS cod
+                    FROM sample_inspection si
+                    JOIN sample_inspection_error sie ON si.id = sie.sample_inspection_id
+                    JOIN error e ON sie.error_id = e.id
+                    WHERE si.audit = 0
+                      AND DATE(si.ts) BETWEEN :start AND :end
+                      {cell_filter}
+                    GROUP BY e.cod
+                    ORDER BY COUNT(*) DESC
+                    LIMIT :top_n
+                """
+                top_params = params.copy()
+                top_params['top_n'] = top_n
+                top_rows = conn.execute(text(top_query), top_params).mappings().all()
+                top_ids = [row['cod'] for row in top_rows]
+
+            if error_cod:
+                error_join = ' JOIN error e ON sie.error_id = e.id'
+                error_filter = ' AND e.cod = :error_cod'
+                params['error_cod'] = error_cod
+            elif top_ids:
+                error_join = ' JOIN error e ON sie.error_id = e.id'
+                placeholders = ','.join(f":top{i}" for i in range(len(top_ids)))
+                error_filter = f' AND e.cod IN ({placeholders})'
+                for i, cod in enumerate(top_ids):
+                    params[f"top{i}"] = cod
+            elif top_n:
+                error_join = ' JOIN error e ON sie.error_id = e.id'
+                error_filter = ' AND 1=0'
+
+            baseline_defect_query = f"""
+                SELECT COUNT(sie.error_id) AS total
+                FROM sample_inspection si
+                JOIN sample_inspection_error sie ON si.id = sie.sample_inspection_id
+                {error_join}
+                WHERE si.audit = 0
+                  AND DATE(si.ts) BETWEEN :b_start AND :b_end
+                  {cell_filter}
+                  {error_filter}
+            """
+
+            daily_defect_query = f"""
+                SELECT {bucket} AS date, COUNT(sie.error_id) AS total
+                FROM sample_inspection si
+                JOIN sample_inspection_error sie ON si.id = sie.sample_inspection_id
+                {error_join}
+                WHERE si.audit = 0
+                  AND DATE(si.ts) BETWEEN :start AND :end
+                  {cell_filter}
+                  {error_filter}
+                GROUP BY date
+            """
+
             insp_base = conn.execute(text(baseline_insp_query), params).scalar() or 0
             defect_base = conn.execute(text(baseline_defect_query), params).scalar() or 0
             insp_rows = conn.execute(text(daily_insp_query), params).mappings().all()

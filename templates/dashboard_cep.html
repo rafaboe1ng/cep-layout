@@ -35,6 +35,28 @@
       </header>
         <div class="accordion" id="filterAccordion">
           <div class="accordion-item">
+            <h2 class="accordion-header" id="headingGeneral">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGeneral" aria-expanded="false" aria-controls="collapseGeneral">Defeitos Gerais</button>
+            </h2>
+            <div id="collapseGeneral" class="accordion-collapse collapse" aria-labelledby="headingGeneral" data-bs-parent="#filterAccordion">
+              <div class="accordion-body">
+                <div class="toggle-switch">
+                  <span class="order-label">Todos</span>
+                  <label class="switch">
+                    <input type="checkbox" id="generalDefectsSwitch" checked>
+                    <span class="slider"></span>
+                  </label>
+                  <span class="order-label">Top</span>
+                </div>
+                <div id="generalQuantityContainer" class="quantity-container d-flex align-items-center">
+                  <label for="generalDefectsQuantity" class="me-2">Quantidade:</label>
+                  <input type="number" id="generalDefectsQuantity" class="form-control quantity-input me-2" min="1" value="6">
+                  <button id="generalDefectsOk" class="btn btn-warning btn-sm">OK</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
             <h2 class="accordion-header" id="headingDate">
               <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDate" aria-expanded="false" aria-controls="collapseDate">Data</button>
             </h2>
