@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
           } else {
             filterText = dateSelect.options[dateSelect.selectedIndex].text;
           }
-          if (footerPeriodEl) footerPeriodEl.textContent = `${filterText}:`;
+          if (footerPeriodEl) footerPeriodEl.textContent = `${filterText}`;
           if (insp) insp.textContent = `Inspeções: ${data.total_inspections}`;
           if (def) def.textContent = `Defeitos: ${data.total_defects}`;
         }
