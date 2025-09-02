@@ -543,25 +543,46 @@ document.addEventListener('DOMContentLoaded', () => {
     return fetch(`/get_top_defects?${params.toString()}`)
       .then((r) => r.json())
       .then((data) => {
-        if (data.success) {
-          const grids = document.querySelectorAll('.top3-row .grafico-grid');
-          for (let i = 0; i < 3; i++) {
-            const title = topDefectTitles[i];
-            const grid = grids[i];
-            const defect = data.defects[i];
+        if (!data.success) return;
+
+        const defects = data.defects || [];
+        const count = defects.length;
+        const titleEl = document.querySelector('.top3-title');
+        const row = document.querySelector('.top3-row');
+        const items = row ? row.querySelectorAll('.chart-item') : [];
+        const grids = row ? row.querySelectorAll('.grafico-grid') : [];
+
+        if (titleEl) {
+          if (count === 1) titleEl.textContent = 'TOP 1 DEFEITO';
+          else if (count === 2) titleEl.textContent = 'TOP 2 DEFEITOS';
+          else titleEl.textContent = 'TOP 3 DEFEITOS';
+        }
+
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          const grid = grids[i];
+          const title = topDefectTitles[i];
+          const defect = defects[i];
+
+          if (defect) {
+            item.style.display = '';
             if (title) {
-              if (defect) {
-                title.innerHTML = `<span class="defect-name">${formatDefectId(defect.id)} - ${defect.name}</span> <span class="defect-count" title="Quantidade de Ocorrências.">(${defect.total})</span>`;
-              } else {
-                title.innerHTML = '<span class="defect-name">-</span> <span class="defect-count" title="Quantidade de Ocorrências.">(0)</span>';
-              }
+              title.innerHTML = `<span class="defect-name">${formatDefectId(defect.id)} - ${defect.name}</span> <span class="defect-count" title="Quantidade de Ocorrências.">(${defect.total})</span>`;
             }
             if (grid) {
-              if (grid._chart) {
-                grid._chart.destroy();
-              }
+              if (grid._chart) grid._chart.destroy();
               grid.innerHTML = '';
-              grid.dataset.errorId = defect ? defect.id : '';
+              grid.dataset.errorId = defect.id;
+            }
+          } else {
+            item.style.display = 'none';
+            if (title) {
+              title.innerHTML = '<span class="defect-name">-</span> <span class="defect-count" title="Quantidade de Ocorrências.">(0)</span>';
+            }
+            if (grid) {
+              if (grid._chart) grid._chart.destroy();
+              grid.innerHTML = '';
+              grid.dataset.errorId = '';
             }
           }
         }
