@@ -4,6 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (hamburgerSidebarBtn) {
     hamburgerSidebarBtn.addEventListener('click', function () {
       sidebar.classList.toggle('minimized');
+      if (sidebar.classList.contains('minimized')) {
+        sidebar.querySelectorAll('.accordion-collapse.show').forEach((el) => {
+          bootstrap.Collapse.getOrCreateInstance(el).hide();
+        });
+      }
       updateFooterCells();
     });
   }
@@ -13,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const startDateInput = document.getElementById('startDate');
   const endDateInput = document.getElementById('endDate');
   const selectedCells = new Map();
+  let allCellsList = [];
   const lastUpdateEl = document.getElementById('lastUpdate');
   const updateNowBtn = document.getElementById('updateNowBtn');
   const footerCellsEl = document.getElementById('footerCells');
@@ -163,13 +169,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateFooterCells() {
     if (!footerCellsEl) return;
-    const minimized = sidebar.classList.contains('minimized');
-    footerCellsEl.style.display = minimized ? '' : 'none';
-    if (!minimized) return;
-    if (selectedCells.size === 0) {
-      footerCellsEl.textContent = 'UPS-01, UPS-02, UPS-07';
+    footerCellsEl.style.display = '';
+    const allSelected =
+      selectedCells.size === 0 || selectedCells.size === allCellsList.length;
+    if (allSelected) {
+      footerCellsEl.textContent = 'Todas as Células';
     } else {
-      const cells = Array.from(selectedCells.keys()).map((c) => c.replace('UPS', 'UPS-0'));
+      const cells = Array.from(selectedCells.keys()).map((c) =>
+        c.replace('UPS', 'UPS-0')
+      );
       footerCellsEl.textContent = cells.join(', ');
     }
   }
@@ -447,9 +455,11 @@ document.addEventListener('DOMContentLoaded', () => {
           options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: { padding: { right: 20 } },
             scales: {
               x: {
                 type: "category",
+                offset: true,
                 ticks: {
                   maxRotation: 0,
                   autoSkip: true,
@@ -792,6 +802,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const cellSidebar = document.getElementById('selectedCellsSidebar');
   const clearCellsBtn = document.getElementById('clearCellsBtn');
   if (cellSelect && cellSidebar && clearCellsBtn) {
+    allCellsList = Array.from(cellSelect.querySelectorAll('option'))
+      .map((o) => toDbCell(o.value))
+      .filter(Boolean);
     function updateCellSidebarVisibility() {
       clearCellsBtn.style.display = selectedCells.size > 0 ? '' : 'none';
     }

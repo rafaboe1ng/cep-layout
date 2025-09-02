@@ -176,6 +176,7 @@ body {
 .sidebar.minimized {
   width: 60px;
   padding: 0 5px 24px;
+  overflow: hidden;
 }
 
 /* Esconde todos os textos e controles da sidebar quando minimizada */
@@ -188,6 +189,12 @@ body {
 .sidebar.minimized .filter-select,
 .sidebar.minimized .custom-date-range {
   display: none;
+}
+
+/* Garante que filtros expandidos não apareçam quando a sidebar estiver minimizada */
+.sidebar.minimized .accordion-collapse,
+.sidebar.minimized .selected-defects-sidebar {
+  display: none !important;
 }
 
 .sidebar-header {
