@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const selectedCells = new Map();
   const lastUpdateEl = document.getElementById('lastUpdate');
   const updateNowBtn = document.getElementById('updateNowBtn');
+  const footerCellsEl = document.getElementById('footerCells');
 
   const toDbCell = (name) => name.replace('-', '').replace('UPS0', 'UPS');
 
@@ -141,10 +142,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.success) {
           const insp = document.getElementById('totalInspections');
           const def = document.getElementById('totalDefects');
-          if (insp) insp.textContent = `Inspeções: ${data.total_inspections}`;
-          if (def) def.textContent = `Defeitos: ${data.total_defects}`;
+          const filterText = dateSelect.options[dateSelect.selectedIndex].text;
+          if (insp) insp.textContent = `Inspeções (${filterText}): ${data.total_inspections}`;
+          if (def) def.textContent = `Defeitos (${filterText}): ${data.total_defects}`;
         }
       });
+  }
+
+  function updateFooterCells() {
+    if (!footerCellsEl) return;
+    if (selectedCells.size === 0) {
+      footerCellsEl.textContent = 'UPS-01, UPS-02, UPS-07';
+    } else {
+      const cells = Array.from(selectedCells.keys()).map((c) => c.replace('UPS', 'UPS-0'));
+      footerCellsEl.textContent = cells.join(', ');
+    }
   }
 
   if (dateSelect && customRange) {
@@ -775,6 +787,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       selectedCells.clear();
       updateCellSidebarVisibility();
+      updateFooterCells();
       refreshAndUpdate();
     });
 
@@ -799,6 +812,7 @@ document.addEventListener('DOMContentLoaded', () => {
           cellSidebar.removeChild(item);
           selectedCells.delete(dbValue);
           updateCellSidebarVisibility();
+          updateFooterCells();
           refreshAndUpdate();
         };
 
@@ -807,6 +821,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cellSidebar.appendChild(item);
         selectedCells.set(dbValue, item);
         updateCellSidebarVisibility();
+        updateFooterCells();
         refreshAndUpdate();
       }
 
@@ -814,6 +829,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     updateCellSidebarVisibility();
+    updateFooterCells();
   }
 
   if (updateNowBtn)

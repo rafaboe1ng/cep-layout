@@ -564,8 +564,12 @@ body {
   width: auto;
 }
 
+.footer-cells {
+  flex: 1;
+  text-align: center;
+}
+
 .footer-right {
-  margin-left: auto;
   text-align: right;
 }
 
