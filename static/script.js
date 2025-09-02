@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const [datePart, timePart = ""] = str.split("T");
     const [y, m, d] = datePart.split("-").map(Number);
     const [h = 0, mi = 0, s = 0] = timePart.split(":").map(Number);
-    return new Date(Date.UTC(y, m - 1, d, h + 3, mi, s));
+    return new Date(Date.UTC(y, m - 1, d, h, mi, s));
   };
 
   const formatDateTime = (input) => {
