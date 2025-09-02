@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (hamburgerSidebarBtn) {
     hamburgerSidebarBtn.addEventListener('click', function () {
       sidebar.classList.toggle('minimized');
+      updateFooterCells();
     });
   }
 
@@ -15,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const lastUpdateEl = document.getElementById('lastUpdate');
   const updateNowBtn = document.getElementById('updateNowBtn');
   const footerCellsEl = document.getElementById('footerCells');
+  const footerPeriodEl = document.getElementById('footerPeriod');
 
   const toDbCell = (name) => name.replace('-', '').replace('UPS0', 'UPS');
 
@@ -142,15 +144,28 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.success) {
           const insp = document.getElementById('totalInspections');
           const def = document.getElementById('totalDefects');
-          const filterText = dateSelect.options[dateSelect.selectedIndex].text;
-          if (insp) insp.textContent = `Inspeções (${filterText}): ${data.total_inspections}`;
-          if (def) def.textContent = `Defeitos (${filterText}): ${data.total_defects}`;
+          let filterText;
+          if (dateSelect.value === 'custom') {
+            const formatDisp = (s) => {
+              const [y, m, d] = s.split('-');
+              return `${d}/${m}/${y}`;
+            };
+            filterText = `${formatDisp(start)} - ${formatDisp(end)}`;
+          } else {
+            filterText = dateSelect.options[dateSelect.selectedIndex].text;
+          }
+          if (footerPeriodEl) footerPeriodEl.textContent = `${filterText}:`;
+          if (insp) insp.textContent = `Inspeções: ${data.total_inspections}`;
+          if (def) def.textContent = `Defeitos: ${data.total_defects}`;
         }
       });
   }
 
   function updateFooterCells() {
     if (!footerCellsEl) return;
+    const minimized = sidebar.classList.contains('minimized');
+    footerCellsEl.style.display = minimized ? '' : 'none';
+    if (!minimized) return;
     if (selectedCells.size === 0) {
       footerCellsEl.textContent = 'UPS-01, UPS-02, UPS-07';
     } else {
