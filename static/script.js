@@ -200,7 +200,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateGeneralQuantityVisibility() {
     if (!generalQuantityContainer) return;
-    generalQuantityContainer.hidden = !(generalSwitch && generalSwitch.checked);
+    const show = generalSwitch && generalSwitch.checked;
+    generalQuantityContainer.style.setProperty(
+      'display',
+      show ? 'flex' : 'none',
+      'important'
+    );
   }
 
   if (generalSwitch) {
