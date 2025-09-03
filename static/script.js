@@ -200,17 +200,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateGeneralQuantityVisibility() {
     if (!generalQuantityContainer) return;
-    generalQuantityContainer.style.display = generalSwitch && generalSwitch.checked ? '' : 'none';
+    generalQuantityContainer.hidden = !(generalSwitch && generalSwitch.checked);
   }
 
   if (generalSwitch) {
     updateGeneralQuantityVisibility();
     generalSwitch.addEventListener('change', () => {
       generalTopEnabled = generalSwitch.checked;
+      generalTopLimit = generalQuantityInput ? parseInt(generalQuantityInput.value) || 6 : 6;
       updateGeneralQuantityVisibility();
-      if (!generalTopEnabled) {
-        refreshAndUpdate();
-      }
+      refreshAndUpdate();
     });
   }
 
