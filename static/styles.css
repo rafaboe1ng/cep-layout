@@ -233,6 +233,15 @@ body {
   margin: 3px 0;
 }
 
+#alertHistoryHamburgerBtn {
+  width: 32px;
+  height: 32px;
+}
+
+#alertHistoryHamburgerBtn .hamburger-bar {
+  background: var(--text-light);
+}
+
 .sidebar-title {
   font-size: 1.3rem;
   color: var(--yellow);
@@ -809,6 +818,10 @@ body {
 
 #alertHistoryFilters {
   margin-bottom: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 1050;
+  background: var(--body-bg);
 }
 
 #alertHistoryFilters select,

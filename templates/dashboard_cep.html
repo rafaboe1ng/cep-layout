@@ -205,11 +205,18 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Histórico de Alertas</h5>
+          <div class="d-flex align-items-center">
+            <button id="alertHistoryHamburgerBtn" class="sidebar-hamburger-btn me-2" title="Abrir/Fechar Filtros">
+              <span class="hamburger-bar"></span>
+              <span class="hamburger-bar"></span>
+              <span class="hamburger-bar"></span>
+            </button>
+            <h5 class="modal-title mb-0">Histórico de Alertas</h5>
+          </div>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div id="alertHistoryFilters" class="accordion mb-2">
+          <div id="alertHistoryFilters" class="accordion mb-2 d-none">
             <div class="accordion-item">
               <h2 class="accordion-header" id="alertHistoryHeadingDate">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#alertHistoryCollapseDate" aria-expanded="false" aria-controls="alertHistoryCollapseDate">Data</button>

@@ -29,6 +29,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const alertCellSidebar = document.getElementById('alertHistorySelectedCells');
   const alertClearCellsBtn = document.getElementById('alertHistoryClearCellsBtn');
   const alertSelectedCells = new Map();
+  const alertHistoryFilters = document.getElementById('alertHistoryFilters');
+  const alertHistoryHamburgerBtn = document.getElementById('alertHistoryHamburgerBtn');
+  if (alertHistoryHamburgerBtn && alertHistoryFilters) {
+    alertHistoryHamburgerBtn.addEventListener('click', () => {
+      alertHistoryFilters.classList.toggle('d-none');
+    });
+  }
   let alertOrder = 'date';
   if (alertDateSelect) {
     alertDateSelect.addEventListener('change', () => {
