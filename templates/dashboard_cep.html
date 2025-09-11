@@ -133,6 +133,9 @@
             </div>
           </div>
         </div>
+        <div class="alert-history-wrapper">
+          <button id="alertHistoryBtn" class="accordion-button alert-history-btn" data-bs-toggle="modal" data-bs-target="#alertHistoryModal">Histórico de Alertas</button>
+        </div>
     </aside>
     <div class="snap-container">
       <!-- Página 1: Dashboard -->
@@ -198,6 +201,18 @@
       <span id="footerPeriod" class="cep-yellow"></span>
     </div>
   </footer>
+  <div class="modal fade" id="alertHistoryModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Histórico de Alertas</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        </div>
+      </div>
+    </div>
+  </div>
     <script>
       let onTopPage = true;
       function updatePageNavIcon(isTop) {

@@ -268,6 +268,28 @@ body {
   margin-top: 8px;
 }
 
+.alert-history-wrapper {
+  position: absolute;
+  bottom: 20px;
+  left: 12px;
+  right: 12px;
+}
+
+.alert-history-btn {
+  width: 100%;
+  text-align: left;
+  padding: 1rem 1.25rem;
+  font-size: 1rem;
+}
+
+.alert-history-btn::after {
+  display: none;
+}
+
+.sidebar.minimized .alert-history-wrapper {
+  display: none;
+}
+
 .filter-select,
 .date-input {
   width: 100%;
@@ -763,4 +785,13 @@ body {
   cursor: pointer;
   padding: 0;
   font-size: 0.9rem;
+}
+
+#alertHistoryModal .modal-content {
+  background: var(--body-bg);
+  color: var(--text-light);
+}
+
+#alertHistoryModal .modal-header {
+  border-bottom: none;
 }
