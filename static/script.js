@@ -28,10 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const alertCellSelect = document.getElementById('alertHistoryCellSelect');
   const alertCellSidebar = document.getElementById('alertHistorySelectedCells');
   const alertClearCellsBtn = document.getElementById('alertHistoryClearCellsBtn');
-  const alertHistoryMenuDate = document.getElementById('alertHistoryMenuDate');
-  const alertHistoryMenuCell = document.getElementById('alertHistoryMenuCell');
-  const alertHistoryHamburger = document.getElementById('alertHistoryHamburger');
-  const alertHistoryFilters = document.getElementById('alertHistoryFilters');
   const alertSelectedCells = new Map();
   let alertOrder = 'date';
   if (alertDateSelect) {
@@ -42,43 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (alertStartDateInput) alertStartDateInput.addEventListener('change', updateAlertHistoryModal);
   if (alertEndDateInput) alertEndDateInput.addEventListener('change', updateAlertHistoryModal);
-  if (alertHistoryMenuDate) {
-    alertHistoryMenuDate.addEventListener('click', (e) => {
-      e.preventDefault();
-      alertOrder = 'date';
-      updateAlertHistoryModal();
-    });
-  }
-  if (alertHistoryMenuCell) {
-    alertHistoryMenuCell.addEventListener('click', (e) => {
-      e.preventDefault();
-      alertOrder = 'cell';
-      updateAlertHistoryModal();
-    });
-  }
-  if (alertHistoryHamburger && alertHistoryFilters) {
-    alertHistoryHamburger.addEventListener('click', () => {
-      alertHistoryFilters.classList.toggle('d-none');
-      if (alertHistoryFilters.classList.contains('d-none')) {
-        alertHistoryFilters
-          .querySelectorAll('.accordion-collapse.show')
-          .forEach((el) => {
-            bootstrap.Collapse.getOrCreateInstance(el).hide();
-          });
-      }
-    });
-  }
-  const alertHistoryModalEl = document.getElementById('alertHistoryModal');
-  if (alertHistoryModalEl && alertHistoryFilters) {
-    alertHistoryModalEl.addEventListener('hidden.bs.modal', () => {
-      alertHistoryFilters.classList.add('d-none');
-      alertHistoryFilters
-        .querySelectorAll('.accordion-collapse.show')
-        .forEach((el) => {
-          bootstrap.Collapse.getOrCreateInstance(el).hide();
-        });
-    });
-  }
   toggleAlertCustomRange();
   const lastUpdateEl = document.getElementById('lastUpdate');
   const updateNowBtn = document.getElementById('updateNowBtn');

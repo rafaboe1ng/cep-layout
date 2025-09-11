@@ -787,13 +787,24 @@ body {
   font-size: 0.9rem;
 }
 
+#alertHistoryModal .modal-dialog {
+  max-width: 800px;
+  width: 90%;
+}
+
 #alertHistoryModal .modal-content {
   background: var(--body-bg);
   color: var(--text-light);
+  max-height: calc(100vh - 120px);
 }
 
 #alertHistoryModal .modal-header {
   border-bottom: none;
+}
+
+#alertHistoryModal .modal-body {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
 }
 
 #alertHistoryFilters {
@@ -805,4 +816,12 @@ body {
   background: var(--body-bg);
   color: var(--text-light);
   border: 1px solid var(--border-color, #555);
+}
+
+#alertHistoryList {
+  overflow-x: auto;
+}
+
+#alertHistoryList div {
+  white-space: nowrap;
 }
