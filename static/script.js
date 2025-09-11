@@ -25,9 +25,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const alertCustomRange = document.getElementById('alertHistoryCustomRange');
   const alertStartDateInput = document.getElementById('alertHistoryStartDate');
   const alertEndDateInput = document.getElementById('alertHistoryEndDate');
-  const alertUpsSelect = document.getElementById('alertHistoryUpsFilter');
-  const alertCellSelect = document.getElementById('alertHistoryCellFilter');
-  const alertOrderSelect = document.getElementById('alertHistoryOrder');
+  const alertCellSelect = document.getElementById('alertHistoryCellSelect');
+  const alertCellSidebar = document.getElementById('alertHistorySelectedCells');
+  const alertClearCellsBtn = document.getElementById('alertHistoryClearCellsBtn');
+  const alertHistoryMenuDate = document.getElementById('alertHistoryMenuDate');
+  const alertHistoryMenuCell = document.getElementById('alertHistoryMenuCell');
+  const alertHistoryDateBox = document.getElementById('alertHistoryDateBox');
+  const alertHistoryCellBox = document.getElementById('alertHistoryCellBox');
+  const alertSelectedCells = new Map();
+  let alertOrder = 'date';
   if (alertDateSelect) {
     alertDateSelect.addEventListener('change', () => {
       toggleAlertCustomRange();
@@ -36,9 +42,24 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (alertStartDateInput) alertStartDateInput.addEventListener('change', updateAlertHistoryModal);
   if (alertEndDateInput) alertEndDateInput.addEventListener('change', updateAlertHistoryModal);
-  if (alertUpsSelect) alertUpsSelect.addEventListener('change', updateAlertHistoryModal);
-  if (alertCellSelect) alertCellSelect.addEventListener('change', updateAlertHistoryModal);
-  if (alertOrderSelect) alertOrderSelect.addEventListener('change', updateAlertHistoryModal);
+  if (alertHistoryMenuDate) {
+    alertHistoryMenuDate.addEventListener('click', (e) => {
+      e.preventDefault();
+      alertOrder = 'date';
+      if (alertHistoryDateBox) alertHistoryDateBox.style.display = '';
+      if (alertHistoryCellBox) alertHistoryCellBox.style.display = 'none';
+      updateAlertHistoryModal();
+    });
+  }
+  if (alertHistoryMenuCell) {
+    alertHistoryMenuCell.addEventListener('click', (e) => {
+      e.preventDefault();
+      alertOrder = 'cell';
+      if (alertHistoryCellBox) alertHistoryCellBox.style.display = '';
+      if (alertHistoryDateBox) alertHistoryDateBox.style.display = 'none';
+      updateAlertHistoryModal();
+    });
+  }
   toggleAlertCustomRange();
   const lastUpdateEl = document.getElementById('lastUpdate');
   const updateNowBtn = document.getElementById('updateNowBtn');
@@ -134,23 +155,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const list = document.getElementById('alertHistoryList');
     if (!list) return;
     let filtered = alertHistory.slice();
-    if (alertDateSelect) {
-      const { start, end } = getAlertDateRange();
-      const startDate = parseLocalDate(start);
-      const endDate = parseLocalDate(end);
-      endDate.setDate(endDate.getDate() + 1);
-      filtered = filtered.filter(({ date }) => date >= startDate && date < endDate);
-    }
-    if (alertUpsSelect && alertUpsSelect.value) {
-      filtered = filtered.filter(({ ups }) => ups === alertUpsSelect.value);
-    }
-    if (alertCellSelect && alertCellSelect.value) {
-      filtered = filtered.filter(({ cell }) => cell === alertCellSelect.value);
-    }
-    if (alertOrderSelect && alertOrderSelect.value === 'ups') {
-      filtered.sort((a, b) => a.ups.localeCompare(b.ups) || b.date - a.date);
+    if (alertOrder === 'date') {
+      if (alertDateSelect) {
+        const { start, end } = getAlertDateRange();
+        const startDate = parseLocalDate(start);
+        const endDate = parseLocalDate(end);
+        endDate.setDate(endDate.getDate() + 1);
+        filtered = filtered.filter(({ date }) => date >= startDate && date < endDate);
+      }
+      filtered.sort((a, b) => b.date - a.date || a.cell.localeCompare(b.cell));
     } else {
-      filtered.sort((a, b) => b.date - a.date || a.ups.localeCompare(b.ups));
+      if (alertSelectedCells.size > 0) {
+        filtered = filtered.filter(({ cell }) => alertSelectedCells.has(cell));
+      }
+      filtered.sort((a, b) => a.cell.localeCompare(b.cell) || b.date - a.date);
     }
     list.innerHTML = filtered.map((h) => `<div>${h.message}</div>`).join('');
   }
@@ -1112,7 +1130,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .map((o) => toDbCell(o.value))
       .filter(Boolean);
     if (alertCellSelect) {
-      alertCellSelect.innerHTML = '<option value="">Todas Células</option>';
+      alertCellSelect.innerHTML = '<option value="">Selecione uma célula</option>';
       allCellsList.forEach((cell) => {
         const disp = fromDbCell(cell);
         const opt = document.createElement('option');
@@ -1174,6 +1192,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateCellSidebarVisibility();
     updateFooterCells();
+  }
+
+  if (alertCellSelect && alertCellSidebar && alertClearCellsBtn) {
+    function updateAlertCellSidebarVisibility() {
+      alertClearCellsBtn.style.display = alertSelectedCells.size > 0 ? '' : 'none';
+    }
+
+    alertClearCellsBtn.addEventListener('click', () => {
+      alertSelectedCells.forEach((item) => {
+        if (item.parentNode) alertCellSidebar.removeChild(item);
+      });
+      alertSelectedCells.clear();
+      updateAlertCellSidebarVisibility();
+      updateAlertHistoryModal();
+    });
+
+    alertCellSelect.addEventListener('change', () => {
+      const value = alertCellSelect.value;
+      if (value && !alertSelectedCells.has(value)) {
+        const item = document.createElement('div');
+        item.className = 'sidebar-selected-defect';
+
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = value;
+        item.appendChild(nameSpan);
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-defect-btn';
+        removeBtn.textContent = '✕';
+        item.appendChild(removeBtn);
+
+        const remove = (e) => {
+          if (e) e.stopPropagation();
+          alertCellSidebar.removeChild(item);
+          alertSelectedCells.delete(value);
+          updateAlertCellSidebarVisibility();
+          updateAlertHistoryModal();
+        };
+
+        removeBtn.addEventListener('click', remove);
+
+        alertCellSidebar.appendChild(item);
+        alertSelectedCells.set(value, item);
+        updateAlertCellSidebarVisibility();
+        updateAlertHistoryModal();
+      }
+      alertCellSelect.value = '';
+    });
+
+    updateAlertCellSidebarVisibility();
   }
 
   if (updateNowBtn)

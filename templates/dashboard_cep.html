@@ -205,40 +205,44 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
+          <div class="dropdown me-2">
+            <button class="btn btn-outline-light dropdown-toggle" type="button" id="alertHistoryHamburger" data-bs-toggle="dropdown" aria-expanded="false">☰</button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#" id="alertHistoryMenuDate">Ordenar por Data</a></li>
+              <li><a class="dropdown-item" href="#" id="alertHistoryMenuCell">Ordenar por Célula</a></li>
+            </ul>
+          </div>
           <h5 class="modal-title">Histórico de Alertas</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div id="alertHistoryFilters" class="d-flex flex-wrap gap-2 mb-2">
-            <select id="alertHistoryOrder" class="form-select form-select-sm">
-              <option value="date">Ordenar por Data</option>
-              <option value="ups">Ordenar por UPS</option>
-            </select>
-            <select id="alertHistoryUpsFilter" class="form-select form-select-sm">
-              <option value="">Todas UPS</option>
-              <option value="UPS-01">UPS-01</option>
-              <option value="UPS-02">UPS-02</option>
-            </select>
-            <select id="alertHistoryCellFilter" class="form-select form-select-sm">
-              <option value="">Todas Células</option>
-            </select>
-            <select id="alertHistoryDateFilter" class="form-select form-select-sm">
-              <option value="today">Hoje</option>
-              <option value="yesterday">Ontem</option>
-              <option value="last3">Últimos 3 Dias</option>
-              <option value="last7">Últimos 7 Dias</option>
-              <option value="last30" selected>Últimos 30 Dias</option>
-              <option value="currentWeek">Semana Atual</option>
-              <option value="previousWeek">Semana Anterior</option>
-              <option value="currentMonth">Mês Atual</option>
-              <option value="previousMonth">Mês Anterior</option>
-              <option value="currentYear">Ano Atual</option>
-              <option value="previousYear">Ano Anterior</option>
-              <option value="custom">Personalizado</option>
-            </select>
-            <div id="alertHistoryCustomRange" class="d-flex gap-1" style="display:none;">
-              <input type="date" id="alertHistoryStartDate" class="form-control form-control-sm" />
-              <input type="date" id="alertHistoryEndDate" class="form-control form-control-sm" />
+          <div id="alertHistoryFilters" class="mb-2">
+            <div id="alertHistoryDateBox">
+              <select id="alertHistoryDateFilter" class="form-select form-select-sm mb-2">
+                <option value="today">Hoje</option>
+                <option value="yesterday">Ontem</option>
+                <option value="last3">Últimos 3 Dias</option>
+                <option value="last7">Últimos 7 Dias</option>
+                <option value="last30" selected>Últimos 30 Dias</option>
+                <option value="currentWeek">Semana Atual</option>
+                <option value="previousWeek">Semana Anterior</option>
+                <option value="currentMonth">Mês Atual</option>
+                <option value="previousMonth">Mês Anterior</option>
+                <option value="currentYear">Ano Atual</option>
+                <option value="previousYear">Ano Anterior</option>
+                <option value="custom">Personalizado</option>
+              </select>
+              <div id="alertHistoryCustomRange" class="d-flex gap-1" style="display:none;">
+                <input type="date" id="alertHistoryStartDate" class="form-control form-control-sm" />
+                <input type="date" id="alertHistoryEndDate" class="form-control form-control-sm" />
+              </div>
+            </div>
+            <div id="alertHistoryCellBox" style="display:none;">
+              <select id="alertHistoryCellSelect" class="form-select form-select-sm">
+                <option value="">Selecione uma célula</option>
+              </select>
+              <button id="alertHistoryClearCellsBtn" class="btn btn-warning btn-sm mt-2 w-100" style="display:none;">Limpar Todos</button>
+              <div id="alertHistorySelectedCells" class="selected-defects-sidebar"></div>
             </div>
           </div>
           <div id="alertHistoryList"></div>
