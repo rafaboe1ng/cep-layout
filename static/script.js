@@ -21,6 +21,25 @@ document.addEventListener('DOMContentLoaded', () => {
   let allCellsList = [];
   const alertHistory = [];
   const lastAlertMap = new Map();
+  const alertDateSelect = document.getElementById('alertHistoryDateFilter');
+  const alertCustomRange = document.getElementById('alertHistoryCustomRange');
+  const alertStartDateInput = document.getElementById('alertHistoryStartDate');
+  const alertEndDateInput = document.getElementById('alertHistoryEndDate');
+  const alertUpsSelect = document.getElementById('alertHistoryUpsFilter');
+  const alertCellSelect = document.getElementById('alertHistoryCellFilter');
+  const alertOrderSelect = document.getElementById('alertHistoryOrder');
+  if (alertDateSelect) {
+    alertDateSelect.addEventListener('change', () => {
+      toggleAlertCustomRange();
+      updateAlertHistoryModal();
+    });
+  }
+  if (alertStartDateInput) alertStartDateInput.addEventListener('change', updateAlertHistoryModal);
+  if (alertEndDateInput) alertEndDateInput.addEventListener('change', updateAlertHistoryModal);
+  if (alertUpsSelect) alertUpsSelect.addEventListener('change', updateAlertHistoryModal);
+  if (alertCellSelect) alertCellSelect.addEventListener('change', updateAlertHistoryModal);
+  if (alertOrderSelect) alertOrderSelect.addEventListener('change', updateAlertHistoryModal);
+  toggleAlertCustomRange();
   const lastUpdateEl = document.getElementById('lastUpdate');
   const updateNowBtn = document.getElementById('updateNowBtn');
   const footerCellsEl = document.getElementById('footerCells');
@@ -112,9 +131,28 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   function updateAlertHistoryModal() {
-    const body = document.querySelector('#alertHistoryModal .modal-body');
-    if (!body) return;
-    body.innerHTML = alertHistory.map((msg) => `<div>${msg}</div>`).join('');
+    const list = document.getElementById('alertHistoryList');
+    if (!list) return;
+    let filtered = alertHistory.slice();
+    if (alertDateSelect) {
+      const { start, end } = getAlertDateRange();
+      const startDate = parseLocalDate(start);
+      const endDate = parseLocalDate(end);
+      endDate.setDate(endDate.getDate() + 1);
+      filtered = filtered.filter(({ date }) => date >= startDate && date < endDate);
+    }
+    if (alertUpsSelect && alertUpsSelect.value) {
+      filtered = filtered.filter(({ ups }) => ups === alertUpsSelect.value);
+    }
+    if (alertCellSelect && alertCellSelect.value) {
+      filtered = filtered.filter(({ cell }) => cell === alertCellSelect.value);
+    }
+    if (alertOrderSelect && alertOrderSelect.value === 'ups') {
+      filtered.sort((a, b) => a.ups.localeCompare(b.ups) || b.date - a.date);
+    } else {
+      filtered.sort((a, b) => b.date - a.date || a.ups.localeCompare(b.ups));
+    }
+    list.innerHTML = filtered.map((h) => `<div>${h.message}</div>`).join('');
   }
 
   function logAlert(cell, point) {
@@ -124,10 +162,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!limitType) return;
     const limitLabel = limitType === 'Superior' ? 'UCL' : 'LCL';
     const limitValue = limitType === 'Superior' ? point.ucl : point.lcl;
-    const formattedDate = formatDateTime(parseLocalDateTime(dateStr), true);
+    const dateObj = parseLocalDateTime(dateStr);
+    const formattedDate = formatDateTime(dateObj, true);
     const cellName = fromDbCell(cell);
+    const ups = cellName.split('-').slice(0, 2).join('-');
     const message = `${formattedDate} - ${cellName} - O gráfico U está fora do Limite ${limitType}. U = ${Number(point.u).toFixed(4)} e ${limitLabel} = ${Number(limitValue).toFixed(4)}`;
-    alertHistory.unshift(message);
+    alertHistory.push({ date: dateObj, cell: cellName, ups, message });
     lastAlertMap.set(cell, dateStr);
     updateAlertHistoryModal();
   }
@@ -147,12 +187,14 @@ document.addEventListener('DOMContentLoaded', () => {
         .then((r) => r.json())
         .then((data) => {
           if (!data.success) return;
-          const points = data.data.filter((d) => d.total_inspections > 0);
-          const latest = points[points.length - 1];
-          if (!latest) return;
-          if (latest.u > latest.ucl || latest.u < latest.lcl) {
-            logAlert(cell, latest);
-          }
+          const points = data.data
+            .filter((d) => d.total_inspections > 0)
+            .sort((a, b) => parseLocalDateTime(a.date) - parseLocalDateTime(b.date));
+          points.forEach((p) => {
+            if (p.u > p.ucl || p.u < p.lcl) {
+              logAlert(cell, p);
+            }
+          });
         });
     });
     return Promise.all(tasks);
@@ -163,6 +205,15 @@ document.addEventListener('DOMContentLoaded', () => {
       customRange.style.display = '';
     } else {
       customRange.style.display = 'none';
+    }
+  }
+
+  function toggleAlertCustomRange() {
+    if (!alertDateSelect || !alertCustomRange) return;
+    if (alertDateSelect.value === 'custom') {
+      alertCustomRange.style.display = '';
+    } else {
+      alertCustomRange.style.display = 'none';
     }
   }
 
@@ -229,6 +280,75 @@ document.addEventListener('DOMContentLoaded', () => {
         break;
       default:
         start = end = today;
+    }
+    const pad = (n) => String(n).padStart(2, '0');
+    const format = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    return { start: format(start), end: format(end) };
+  }
+
+  function getAlertDateRange() {
+    const today = new Date();
+    let start;
+    let end;
+    const sel = alertDateSelect ? alertDateSelect.value : 'last30';
+    switch (sel) {
+      case 'today':
+        start = end = today;
+        break;
+      case 'yesterday':
+        const yest = new Date(today);
+        yest.setDate(today.getDate() - 1);
+        start = end = yest;
+        break;
+      case 'last3':
+        start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 2);
+        end = today;
+        break;
+      case 'last7':
+        start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6);
+        end = today;
+        break;
+      case 'last30':
+        start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 29);
+        end = today;
+        break;
+      case 'currentWeek': {
+        const day = today.getDay();
+        const diffToMonday = day === 0 ? -6 : 1 - day;
+        start = new Date(today.getFullYear(), today.getMonth(), today.getDate() + diffToMonday);
+        end = today;
+        break;
+      }
+      case 'previousWeek': {
+        const day = today.getDay();
+        const lastSunday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - day);
+        end = new Date(lastSunday.getFullYear(), lastSunday.getMonth(), lastSunday.getDate());
+        start = new Date(end.getFullYear(), end.getMonth(), end.getDate() - 6);
+        break;
+      }
+      case 'currentMonth':
+        start = new Date(today.getFullYear(), today.getMonth(), 1);
+        end = today;
+        break;
+      case 'previousMonth':
+        start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        end = new Date(today.getFullYear(), today.getMonth(), 0);
+        break;
+      case 'currentYear':
+        start = new Date(today.getFullYear(), 0, 1);
+        end = today;
+        break;
+      case 'previousYear':
+        start = new Date(today.getFullYear() - 1, 0, 1);
+        end = new Date(today.getFullYear() - 1, 11, 31);
+        break;
+      case 'custom':
+        start = alertStartDateInput.value ? parseLocalDate(alertStartDateInput.value) : today;
+        end = alertEndDateInput.value ? parseLocalDate(alertEndDateInput.value) : today;
+        break;
+      default:
+        start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 29);
+        end = today;
     }
     const pad = (n) => String(n).padStart(2, '0');
     const format = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -991,6 +1111,16 @@ document.addEventListener('DOMContentLoaded', () => {
     allCellsList = Array.from(cellSelect.querySelectorAll('option'))
       .map((o) => toDbCell(o.value))
       .filter(Boolean);
+    if (alertCellSelect) {
+      alertCellSelect.innerHTML = '<option value="">Todas Células</option>';
+      allCellsList.forEach((cell) => {
+        const disp = fromDbCell(cell);
+        const opt = document.createElement('option');
+        opt.value = disp;
+        opt.textContent = disp;
+        alertCellSelect.appendChild(opt);
+      });
+    }
     function updateCellSidebarVisibility() {
       clearCellsBtn.style.display = selectedCells.size > 0 ? '' : 'none';
     }

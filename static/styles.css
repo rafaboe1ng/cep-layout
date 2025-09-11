@@ -795,3 +795,17 @@ body {
 #alertHistoryModal .modal-header {
   border-bottom: none;
 }
+
+#alertHistoryFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+#alertHistoryFilters select,
+#alertHistoryFilters input {
+  background: var(--body-bg);
+  color: var(--text-light);
+  border: 1px solid var(--border-color, #555);
+}
