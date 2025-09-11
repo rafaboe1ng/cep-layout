@@ -62,20 +62,23 @@
             </h2>
             <div id="collapseDate" class="accordion-collapse collapse" aria-labelledby="headingDate" data-bs-parent="#filterAccordion">
               <div class="accordion-body">
-                <select id="dateFilter" class="form-select filter-select">
-                  <option value="today" selected>Hoje</option>
-                  <option value="yesterday">Ontem</option>
-                  <option value="last3">Últimos 3 Dias</option>
-                  <option value="last7">Últimos 7 Dias</option>
-                  <option value="last30">Últimos 30 Dias</option>
-                  <option value="currentWeek">Semana Atual</option>
-                  <option value="previousWeek">Semana Anterior</option>
-                  <option value="currentMonth">Mês Atual</option>
-                  <option value="previousMonth">Mês Anterior</option>
-                  <option value="currentYear">Ano Atual</option>
-                  <option value="previousYear">Ano Anterior</option>
-                  <option value="custom">Personalizado</option>
-                </select>
+                <div class="date-select-wrapper d-flex align-items-center">
+                  <select id="dateFilter" class="form-select filter-select me-2">
+                    <option value="today">Hoje</option>
+                    <option value="yesterday">Ontem</option>
+                    <option value="last3">Últimos 3 Dias</option>
+                    <option value="last7">Últimos 7 Dias</option>
+                    <option value="last30" selected>Últimos 30 Dias</option>
+                    <option value="currentWeek">Semana Atual</option>
+                    <option value="previousWeek">Semana Anterior</option>
+                    <option value="currentMonth">Mês Atual</option>
+                    <option value="previousMonth">Mês Anterior</option>
+                    <option value="currentYear">Ano Atual</option>
+                    <option value="previousYear">Ano Anterior</option>
+                    <option value="custom">Personalizado</option>
+                  </select>
+                  <span id="updateInfoIcon" class="info-icon" data-bs-toggle="tooltip" data-bs-html="true" title="">i</span>
+                </div>
                 <div id="customDateRange" class="custom-date-range">
                   <input type="date" id="startDate" class="form-control date-input">
                   <input type="date" id="endDate" class="form-control date-input">

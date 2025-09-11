@@ -288,6 +288,20 @@ body {
   gap: 8px;
 }
 
+.info-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: var(--yellow);
+  color: var(--blue-dark);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
 .checkbox-group,
 .radio-group {
   display: flex;

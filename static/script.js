@@ -29,6 +29,45 @@ document.addEventListener('DOMContentLoaded', () => {
   const generalQuantityContainer = document.getElementById('generalQuantityContainer');
   let generalTopEnabled = true;
   let generalTopLimit = 6;
+  let refreshTimer;
+  const updateInfoIcon = document.getElementById('updateInfoIcon');
+
+  const UPDATE_FREQUENCIES = [
+    { maxDays: 1, minutes: 5 },
+    { maxDays: 3, minutes: 30 },
+    { maxDays: 7, minutes: 60 },
+    { maxDays: 30, minutes: 180 },
+    { maxDays: Infinity, minutes: 1440 },
+  ];
+
+  if (updateInfoIcon) {
+    const formatInterval = (minutes) => {
+      if (minutes % 1440 === 0) {
+        const days = minutes / 1440;
+        return `${days} dia${days > 1 ? 's' : ''}`;
+      }
+      if (minutes % 60 === 0) {
+        const hours = minutes / 60;
+        return `${hours} hora${hours > 1 ? 's' : ''}`;
+      }
+      return `${minutes} min`;
+    };
+    let prev = 0;
+    const lines = UPDATE_FREQUENCIES.map(({ maxDays, minutes }) => {
+      let label;
+      if (maxDays === 1) label = '1 dia';
+      else if (maxDays === Infinity) label = `acima de ${prev} dias`;
+      else label = `até ${maxDays} dias`;
+      prev = maxDays;
+      return `<div>${label} - ${formatInterval(minutes)}</div>`;
+    }).join('');
+    const content = `<div><strong>Frequência de atualização:</strong></div>${lines}`;
+    new bootstrap.Tooltip(updateInfoIcon, {
+      title: content,
+      html: true,
+      trigger: 'hover',
+    });
+  }
 
   const toDbCell = (name) => name.replace('-', '').replace('UPS0', 'UPS');
 
@@ -47,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return new Date(Date.UTC(y, m - 1, d, h, mi, s));
   };
 
-  const formatDateTime = (input) => {
+  const formatDateTime = (input, includeTime = false) => {
     const date =
       input instanceof Date
         ? input
@@ -59,13 +98,14 @@ document.addEventListener('DOMContentLoaded', () => {
       day: '2-digit',
       month: '2-digit',
     });
+    if (!includeTime) return datePart;
     const timePart = date.toLocaleTimeString('pt-BR', {
       timeZone: 'America/Sao_Paulo',
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
     });
-    return timePart === '00:00' ? datePart : `${datePart} ${timePart}`;
+    return `${datePart} ${timePart}`;
   };
 
   function toggleCustomRange() {
@@ -145,6 +185,16 @@ document.addEventListener('DOMContentLoaded', () => {
     return { start: format(start), end: format(end) };
   }
 
+  function getRefreshIntervalMs() {
+    const { start, end } = getDateRange();
+    const startDate = parseLocalDate(start);
+    const endDate = parseLocalDate(end);
+    const diffDays =
+      Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+    const freq = UPDATE_FREQUENCIES.find((f) => diffDays <= f.maxDays);
+    return (freq ? freq.minutes : 60) * 60 * 1000;
+  }
+
   function fetchTotals() {
     if (!dateSelect) return Promise.resolve();
     const { start, end } = getDateRange();
@@ -192,11 +242,17 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleCustomRange();
     dateSelect.addEventListener('change', () => {
       toggleCustomRange();
-      refreshAndUpdate();
+      refreshAndUpdate().then(scheduleRefresh);
     });
   }
-  if (startDateInput) startDateInput.addEventListener('change', refreshAndUpdate);
-  if (endDateInput) endDateInput.addEventListener('change', refreshAndUpdate);
+  if (startDateInput)
+    startDateInput.addEventListener('change', () => {
+      refreshAndUpdate().then(scheduleRefresh);
+    });
+  if (endDateInput)
+    endDateInput.addEventListener('change', () => {
+      refreshAndUpdate().then(scheduleRefresh);
+    });
 
   function updateGeneralQuantityVisibility() {
     if (!generalQuantityContainer) return;
@@ -396,7 +452,19 @@ document.addEventListener('DOMContentLoaded', () => {
             ucl: d.ucl,
             lcl: d.lcl,
           }));
-        const labels = points.map((p) => formatDateTime(p.x));
+        const dayCounts = {};
+        points.forEach((p) => {
+          const dayStr = p.x.toISOString().split('T')[0];
+          dayCounts[dayStr] = (dayCounts[dayStr] || 0) + 1;
+        });
+        const { start, end } = getDateRange();
+        const diffDays =
+          Math.floor((parseLocalDate(end) - parseLocalDate(start)) / (1000 * 60 * 60 * 24)) + 1;
+        const labels = points.map((p) => {
+          const dayStr = p.x.toISOString().split('T')[0];
+          const includeTime = diffDays <= 30 && dayCounts[dayStr] > 1;
+          return formatDateTime(p.x, includeTime);
+        });
         const uData = points.map((p) => p.u);
         const trendData = errorId ? [] : points.map((p) => p.trend);
         const uclData = points.map((p) => p.ucl);
@@ -722,6 +790,13 @@ document.addEventListener('DOMContentLoaded', () => {
     return refreshAll().then(updateLastUpdate);
   }
 
+  function scheduleRefresh() {
+    clearTimeout(refreshTimer);
+    refreshTimer = setTimeout(() => {
+      refreshAndUpdate().then(scheduleRefresh);
+    }, getRefreshIntervalMs());
+  }
+
   if (defectSelect) {
     fetch('/get_errors')
       .then((r) => r.json())
@@ -929,6 +1004,7 @@ document.addEventListener('DOMContentLoaded', () => {
           grid.dataset.ackDate = lastDate;
           grid.classList.remove('blink-red');
         });
+        scheduleRefresh();
       });
     });
   if (generalQuantityOk) {
@@ -939,5 +1015,5 @@ document.addEventListener('DOMContentLoaded', () => {
   } else if (!generalQuantityOk) {
     refreshAndUpdate();
   }
-  setInterval(refreshAndUpdate, 5 * 60 * 1000);
+  scheduleRefresh();
 });
