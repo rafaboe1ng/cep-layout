@@ -30,8 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const alertClearCellsBtn = document.getElementById('alertHistoryClearCellsBtn');
   const alertHistoryMenuDate = document.getElementById('alertHistoryMenuDate');
   const alertHistoryMenuCell = document.getElementById('alertHistoryMenuCell');
-  const alertHistoryDateBox = document.getElementById('alertHistoryDateBox');
-  const alertHistoryCellBox = document.getElementById('alertHistoryCellBox');
+  const alertHistoryHamburger = document.getElementById('alertHistoryHamburger');
+  const alertHistoryFilters = document.getElementById('alertHistoryFilters');
   const alertSelectedCells = new Map();
   let alertOrder = 'date';
   if (alertDateSelect) {
@@ -46,8 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
     alertHistoryMenuDate.addEventListener('click', (e) => {
       e.preventDefault();
       alertOrder = 'date';
-      if (alertHistoryDateBox) alertHistoryDateBox.style.display = '';
-      if (alertHistoryCellBox) alertHistoryCellBox.style.display = 'none';
       updateAlertHistoryModal();
     });
   }
@@ -55,9 +53,30 @@ document.addEventListener('DOMContentLoaded', () => {
     alertHistoryMenuCell.addEventListener('click', (e) => {
       e.preventDefault();
       alertOrder = 'cell';
-      if (alertHistoryCellBox) alertHistoryCellBox.style.display = '';
-      if (alertHistoryDateBox) alertHistoryDateBox.style.display = 'none';
       updateAlertHistoryModal();
+    });
+  }
+  if (alertHistoryHamburger && alertHistoryFilters) {
+    alertHistoryHamburger.addEventListener('click', () => {
+      alertHistoryFilters.classList.toggle('d-none');
+      if (alertHistoryFilters.classList.contains('d-none')) {
+        alertHistoryFilters
+          .querySelectorAll('.accordion-collapse.show')
+          .forEach((el) => {
+            bootstrap.Collapse.getOrCreateInstance(el).hide();
+          });
+      }
+    });
+  }
+  const alertHistoryModalEl = document.getElementById('alertHistoryModal');
+  if (alertHistoryModalEl && alertHistoryFilters) {
+    alertHistoryModalEl.addEventListener('hidden.bs.modal', () => {
+      alertHistoryFilters.classList.add('d-none');
+      alertHistoryFilters
+        .querySelectorAll('.accordion-collapse.show')
+        .forEach((el) => {
+          bootstrap.Collapse.getOrCreateInstance(el).hide();
+        });
     });
   }
   toggleAlertCustomRange();
@@ -155,19 +174,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const list = document.getElementById('alertHistoryList');
     if (!list) return;
     let filtered = alertHistory.slice();
+    if (alertDateSelect) {
+      const { start, end } = getAlertDateRange();
+      const startDate = parseLocalDate(start);
+      const endDate = parseLocalDate(end);
+      endDate.setDate(endDate.getDate() + 1);
+      filtered = filtered.filter(({ date }) => date >= startDate && date < endDate);
+    }
+    if (alertSelectedCells.size > 0) {
+      filtered = filtered.filter(({ cell }) => alertSelectedCells.has(cell));
+    }
     if (alertOrder === 'date') {
-      if (alertDateSelect) {
-        const { start, end } = getAlertDateRange();
-        const startDate = parseLocalDate(start);
-        const endDate = parseLocalDate(end);
-        endDate.setDate(endDate.getDate() + 1);
-        filtered = filtered.filter(({ date }) => date >= startDate && date < endDate);
-      }
       filtered.sort((a, b) => b.date - a.date || a.cell.localeCompare(b.cell));
     } else {
-      if (alertSelectedCells.size > 0) {
-        filtered = filtered.filter(({ cell }) => alertSelectedCells.has(cell));
-      }
       filtered.sort((a, b) => a.cell.localeCompare(b.cell) || b.date - a.date);
     }
     list.innerHTML = filtered.map((h) => `<div>${h.message}</div>`).join('');
@@ -229,9 +248,11 @@ document.addEventListener('DOMContentLoaded', () => {
   function toggleAlertCustomRange() {
     if (!alertDateSelect || !alertCustomRange) return;
     if (alertDateSelect.value === 'custom') {
-      alertCustomRange.style.display = '';
+      alertCustomRange.classList.remove('d-none');
+      alertCustomRange.classList.add('d-flex');
     } else {
-      alertCustomRange.style.display = 'none';
+      alertCustomRange.classList.add('d-none');
+      alertCustomRange.classList.remove('d-flex');
     }
   }
 
