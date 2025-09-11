@@ -19,6 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const endDateInput = document.getElementById('endDate');
   const selectedCells = new Map();
   let allCellsList = [];
+  const alertHistory = [];
+  const lastAlertMap = new Map();
   const lastUpdateEl = document.getElementById('lastUpdate');
   const updateNowBtn = document.getElementById('updateNowBtn');
   const footerCellsEl = document.getElementById('footerCells');
@@ -70,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const toDbCell = (name) => name.replace('-', '').replace('UPS0', 'UPS');
+  const fromDbCell = (db) => db.replace(/UPS(\d+)/, (_, n) => `UPS-${n.padStart(2, '0')}`);
 
   const formatDefectId = (id) => String(id).padStart(4, '0');
 
@@ -107,6 +110,53 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     return `${datePart} ${timePart}`;
   };
+
+  function updateAlertHistoryModal() {
+    const body = document.querySelector('#alertHistoryModal .modal-body');
+    if (!body) return;
+    body.innerHTML = alertHistory.map((msg) => `<div>${msg}</div>`).join('');
+  }
+
+  function logAlert(cell, point) {
+    const dateStr = point.date;
+    if (lastAlertMap.get(cell) === dateStr) return;
+    const limitType = point.u > point.ucl ? 'Superior' : point.u < point.lcl ? 'Inferior' : null;
+    if (!limitType) return;
+    const limitLabel = limitType === 'Superior' ? 'UCL' : 'LCL';
+    const limitValue = limitType === 'Superior' ? point.ucl : point.lcl;
+    const formattedDate = formatDateTime(parseLocalDateTime(dateStr), true);
+    const cellName = fromDbCell(cell);
+    const message = `${formattedDate} - ${cellName} - O gráfico U está fora do Limite ${limitType}. U = ${Number(point.u).toFixed(4)} e ${limitLabel} = ${Number(limitValue).toFixed(4)}`;
+    alertHistory.unshift(message);
+    lastAlertMap.set(cell, dateStr);
+    updateAlertHistoryModal();
+  }
+
+  function checkCellAlerts() {
+    if (!allCellsList.length) return Promise.resolve();
+    const end = new Date();
+    const start = new Date(end.getFullYear(), end.getMonth(), end.getDate() - 29);
+    const pad = (n) => String(n).padStart(2, '0');
+    const fmt = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const startStr = fmt(start);
+    const endStr = fmt(end);
+    const tasks = allCellsList.map((cell) => {
+      const params = new URLSearchParams({ start: startStr, end: endStr, top: 6 });
+      params.append('cell', cell);
+      return fetch(`/get_u_chart?${params.toString()}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (!data.success) return;
+          const points = data.data.filter((d) => d.total_inspections > 0);
+          const latest = points[points.length - 1];
+          if (!latest) return;
+          if (latest.u > latest.ucl || latest.u < latest.lcl) {
+            logAlert(cell, latest);
+          }
+        });
+    });
+    return Promise.all(tasks);
+  }
 
   function toggleCustomRange() {
     if (dateSelect.value === 'custom') {
@@ -787,7 +837,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function refreshAndUpdate() {
-    return refreshAll().then(updateLastUpdate);
+    return Promise.all([refreshAll(), checkCellAlerts()]).then(updateLastUpdate);
   }
 
   function scheduleRefresh() {
