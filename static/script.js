@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     { maxDays: 1, minutes: 5 },
     { maxDays: 3, minutes: 30 },
     { maxDays: 7, minutes: 60 },
-    { maxDays: 30, minutes: 180 },
+    { maxDays: 30, minutes: 120 },
     { maxDays: Infinity, minutes: 1440 },
   ];
 

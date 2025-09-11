@@ -207,7 +207,7 @@ def get_u_chart():
     elif delta_days <= 7:
         bucket = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(si.ts)/3600)*3600)"  # 1 hour
     elif delta_days <= 30:
-        bucket = "FROM_UNIXTIME(FLOOR((UNIX_TIMESTAMP(si.ts) - 9*3600)/10800)*10800 + 12*3600)"  # 3 hours starting at 09:00
+        bucket = "FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(si.ts)/7200)*7200)"  # 2 hours
     else:
         bucket = "DATE(si.ts)"  # 1 day
 
