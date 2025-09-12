@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
       prev = maxDays;
       return `<div>${label} - ${formatInterval(minutes)}</div>`;
     }).join('');
-    const content = `<div><strong>Frequência de atualização:</strong></div>${lines}`;
+    const content = `<div><strong>Período de Amostragem:</strong></div>${lines}`;
     new bootstrap.Tooltip(updateInfoIcon, {
       title: content,
       html: true,
