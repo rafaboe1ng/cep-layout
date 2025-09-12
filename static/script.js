@@ -159,19 +159,20 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function logAlert(cell, point) {
-    const dateStr = point.date;
-    if (lastAlertMap.get(cell) === dateStr) return;
-    const limitType = point.u > point.ucl ? 'Superior' : point.u < point.lcl ? 'Inferior' : null;
+    const dateObj = parseLocalDateTime(point.date);
+    const lastDate = lastAlertMap.get(cell);
+    if (lastDate && dateObj <= lastDate) return;
+    const limitType =
+      point.u > point.ucl ? 'Superior' : point.u < point.lcl ? 'Inferior' : null;
     if (!limitType) return;
     const limitLabel = limitType === 'Superior' ? 'UCL' : 'LCL';
     const limitValue = limitType === 'Superior' ? point.ucl : point.lcl;
-    const dateObj = parseLocalDateTime(dateStr);
     const formattedDate = formatDateTime(dateObj, true);
     const cellName = fromDbCell(cell);
     const ups = cellName.split('-').slice(0, 2).join('-');
     const message = `${formattedDate} - ${cellName} - O gráfico U está fora do Limite ${limitType}. U = ${Number(point.u).toFixed(4)} e ${limitLabel} = ${Number(limitValue).toFixed(4)}`;
     alertHistory.push({ date: dateObj, cell: cellName, ups, message });
-    lastAlertMap.set(cell, dateStr);
+    lastAlertMap.set(cell, dateObj);
     updateAlertHistoryModal();
   }
 
